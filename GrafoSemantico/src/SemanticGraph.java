@@ -2,9 +2,15 @@
 import java.io.*;
 import java.util.*;
 
+import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.standard.*;
+import org.apache.lucene.util.Version;
+
+
+
 
 /**
- * @author Diego Augusto de Faria Barros
+ * @author Diego Augusto de Faria Barros</br>
  * Classe Principal
  */
 public class SemanticGraph {
@@ -83,6 +89,34 @@ public class SemanticGraph {
 		
 		
 	} // Fim do método CarregaParesPalavras
+	
+	
+	/**
+	 * Analisa cada definição do dicionário, eliminando 
+	 * os termos desnecessários (Stop Words) </br>à busca
+	 */
+	static void AnalisaDicionario(String[] texto) {
+		
+		
+		
+		
+		
+	} // Fim do método AnalisaDicionario
+	
+	
+	
+	static String[] AnalisaTexto(String[] texto) {
+		
+		Analyzer analisador = new StandardAnalyzer(Version.LUCENE_44);
+		
+		System.out.println("Analisando: " + texto);
+		
+		
+		
+		
+		
+		return null;
+	}
 	
 	
 	/**
