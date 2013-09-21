@@ -1,8 +1,6 @@
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
+import java.util.*;
 
 
 /**
@@ -11,7 +9,10 @@ import java.util.HashMap;
  */
 public class SemanticGraph {
 	
-	static HashMap<String, String> dicionario;
+	static Map<String,String> dicionario;
+	
+	static LinkedList<String> palavrasOrigem;
+	static LinkedList<String> palavrasDestino;
 
 	static File arquivoDicionario;
 	static File arquivoParesPalavras;
@@ -22,6 +23,9 @@ public class SemanticGraph {
 	static void Inicializa(String[] parametros) {
 		
 		dicionario = new HashMap<String, String>();
+		
+		palavrasOrigem = new LinkedList<String>();
+		palavrasDestino = new LinkedList<String>();
 		
 		arquivoDicionario = new File(parametros[0]);
 		arquivoParesPalavras = new File(parametros[1]);
@@ -49,10 +53,46 @@ public class SemanticGraph {
 		}
 		
 		// Remover StopWords
-		System.out.println("");
-
+		System.out.println("NÃO ESQUEÇA, Remover STOP WORDS!!!");
+		
+		
+		// Adiciona os termos no dicionário (hashmap)
+		for (int i = 0; i < palavras.size(); i++)
+			dicionario.put(palavras.get(i), definicoes.get(i));
+		
+		palavras.clear();
+		definicoes.clear();
 		
 	} // Fim do método Carrega Dicionário
+	
+	
+	/**
+	 * Carrega o arquivo com os pares de palavras que serão medidas as similaridades
+	 */
+	static void CarregaParesPalavras() {
+		
+		String arquivoDeParesPalavras = LerArquivo(arquivoParesPalavras);
+		String[] paresPalavras = arquivoDeParesPalavras.split("\n");
+		
+		
+		for (String par : paresPalavras) {
+			String[] palavras = par.split("-");
+			palavrasOrigem.add(palavras[0]);
+			palavrasDestino.add(palavras[1]);
+		}
+		
+		
+	} // Fim do método CarregaParesPalavras
+	
+	
+	/**
+	 * Imprime todas as entradas do dicionario
+	 */
+	static void ImprimirDicionario() {
+		
+		for (Map.Entry<String, String> registro : dicionario.entrySet())
+			System.out.println(registro.getKey().toString() + "\t\t" + registro.getValue().toString());
+	} // Fim do método ImprimeDicionario
 	
 	/**
 	 * @param arquivo Arquivo de entrada
@@ -139,11 +179,10 @@ public class SemanticGraph {
 	 */
 	public static void main(String[] args) {
 		
-		
 		Inicializa(args);
 		CarregaDicionario();
+		CarregaParesPalavras();
 		
-
 	} // Fim do método Main
 
 } // Fim da classe SemanticGraph
