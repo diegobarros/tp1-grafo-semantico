@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.HashMap;
 
 
 /**
@@ -7,12 +8,27 @@ import java.io.*;
  */
 public class SemanticGraph {
 	
+	static HashMap<String, String> dicionario;
 
-	static File arquivoEntrada;
+	static File arquivoDicionario;
+	static File arquivoParesPalavras;
+	
 	static File arquivoSaida;
 	
 	
-	static void Inicializa() {
+	
+	
+	static void Inicializa(String[] parametros) {
+		
+		dicionario = new HashMap<String, String>();
+		
+		arquivoDicionario = new File(parametros[0]);
+		arquivoParesPalavras = new File(parametros[1]);
+		
+		
+		
+		
+
 
 	} // Fim do método Inicializa
 	
@@ -89,13 +105,15 @@ public class SemanticGraph {
 		}
 		
 	} // Fim do método SalvarArquivo
-	
+	  
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		
+		
+		Inicializa(args);
 		
 
 	} // Fim do método Main
