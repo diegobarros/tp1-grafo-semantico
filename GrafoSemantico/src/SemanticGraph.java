@@ -1,4 +1,7 @@
+
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 
 
@@ -16,8 +19,6 @@ public class SemanticGraph {
 	static File arquivoSaida;
 	
 	
-	
-	
 	static void Inicializa(String[] parametros) {
 		
 		dicionario = new HashMap<String, String>();
@@ -26,12 +27,32 @@ public class SemanticGraph {
 		arquivoParesPalavras = new File(parametros[1]);
 		
 		
-		
-		
-
-
 	} // Fim do método Inicializa
 	
+	
+	/**
+	 * Carrega o arquivo de dados dicionário com a lista de palavras e definições
+	 */
+	static void CarregaDicionario() {
+		
+		ArrayList<String> palavras = new ArrayList<String>();
+		ArrayList<String> definicoes = new ArrayList<String>();
+		
+		String dicionarioPalavras = LerArquivo(arquivoDicionario);
+		String[] camposDicionario = dicionarioPalavras.split("\n");
+		
+		// Obtém as palavras do dicionário
+		for (String termo : camposDicionario) {
+			String[] definicao = termo.split(" ", 2);
+			palavras.add(definicao[0].trim());
+			definicoes.add(definicao[1].trim());
+		}
+		
+		// Remover StopWords
+		System.out.println("");
+
+		
+	} // Fim do método Carrega Dicionário
 	
 	/**
 	 * @param arquivo Arquivo de entrada
@@ -47,9 +68,15 @@ public class SemanticGraph {
 			String linha = leitor.readLine();
 			
 			while (linha != null) {
-				conteudo.append(linha);
-				conteudo.append("\n");
-			}
+				
+				if(!linha.equals("")) {
+					conteudo.append(linha);
+					conteudo.append("\n");
+				}
+				
+				linha = leitor.readLine();
+				
+			} // Fim de while
 			
 			leitor.close();
 			
@@ -114,6 +141,7 @@ public class SemanticGraph {
 		
 		
 		Inicializa(args);
+		CarregaDicionario();
 		
 
 	} // Fim do método Main
