@@ -15,12 +15,20 @@ import org.apache.lucene.util.Version;
  */
 public class SemanticGraph {
 	
-	static Map<String,String> dicionario;
-	static Map<String, ArrayList<String>> tokensDicionario;
+	// Dicionário e Mineração Textual
+	static ArrayList<String> palavrasDicionario;
+	static ArrayList<String> definicoesDicionario;
 	
+	static Map<String, ArrayList<String>> tokensDicionario;
+	static ArrayList<String> palavrasTokenizadasDicionario;
+	static ArrayList<ArrayList<String>> definicoesTokenizadasDicionario;
+	
+	
+	// Palavras de Origem e Destino
 	static LinkedList<String> palavrasOrigem;
 	static LinkedList<String> palavrasDestino;
 
+	// Entrada/Saída dos Dados
 	static File arquivoDicionario;
 	static File arquivoParesPalavras;
 	
@@ -29,8 +37,14 @@ public class SemanticGraph {
 	
 	static void Inicializa(String[] parametros) {
 		
-		dicionario = new HashMap<String, String>();
-		tokensDicionario = new HashMap<String, ArrayList<String>>();
+		//dicionario = new HashMap<String, String>();
+		
+		palavrasDicionario = new ArrayList<String>();
+		definicoesDicionario = new ArrayList<String>();
+		
+		//tokensDicionario = new HashMap<String, ArrayList<String>>();
+		palavrasTokenizadasDicionario = new ArrayList<String>();
+		definicoesTokenizadasDicionario = new ArrayList<ArrayList<String>>();
 		
 		palavrasOrigem = new LinkedList<String>();
 		palavrasDestino = new LinkedList<String>();
@@ -46,36 +60,27 @@ public class SemanticGraph {
 	 * Carrega o arquivo de dados dicionário com a lista de palavras e definições
 	 */
 	static void CarregaDicionario() {
-		
-		ArrayList<String> palavras = new ArrayList<String>();
-		ArrayList<String> definicoes = new ArrayList<String>();
-		
+
 		String dicionarioPalavras = LerArquivo(arquivoDicionario);
 		String[] camposDicionario = dicionarioPalavras.split("\n");
 		
 		// Obtém as palavras do dicionário
 		for (String termo : camposDicionario) {
 			String[] definicao = termo.split(" ", 2);
-			palavras.add(definicao[0].trim());
-			definicoes.add(definicao[1].trim());
+			palavrasDicionario.add(definicao[0].trim());
+			definicoesDicionario.add(definicao[1].trim());
 		}
 		
 		
 		try {
-			String[] palavrasDicionario = palavras.toArray(new String[palavras.size()]);
-			String[] definicoesDicionario = definicoes.toArray(new String[definicoes.size()]);
-			AnalisaDicionario(palavrasDicionario, definicoesDicionario);
+			
+			String[] palavras = palavrasDicionario.toArray(new String[palavrasDicionario.size()]);
+			String[] definicoes = definicoesDicionario.toArray(new String[definicoesDicionario.size()]);
+			AnalisaDicionario(palavras, definicoes);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		
-		// Adiciona os termos no dicionário (hashmap)
-		for (int i = 0; i < palavras.size(); i++)
-			dicionario.put(palavras.get(i), definicoes.get(i));
-		
-		palavras.clear();
-		definicoes.clear();
 		
 	} // Fim do método Carrega Dicionário
 	
@@ -117,7 +122,11 @@ public class SemanticGraph {
 			for(String definicao : tokensDefinicoes)
 				listaTokensDefinicoes.add(definicao);
 			
-			tokensDicionario.put(tokensPalavras[0], listaTokensDefinicoes);
+			
+			palavrasTokenizadasDicionario.add(tokensPalavras[0]);
+			definicoesTokenizadasDicionario.add(listaTokensDefinicoes);
+			
+			//tokensDicionario.put(tokensPalavras[0], listaTokensDefinicoes);
 
 		}
 			
@@ -167,35 +176,30 @@ public class SemanticGraph {
 	
 	static void ConstroiGrafo() {
 		
-		int totalRegistros = tokensDicionario.size();
-		String[] palavras = tokensDicionario.keySet().toArray(new String[totalRegistros]);
-		ArrayList [] definicoes =  tokensDicionario.values().toArray(new ArrayList [totalRegistros]);
-		
-		for (int i = 0; i < palavras.length; i++) {
+		for (int i = 0; i < palavrasTokenizadasDicionario.size(); i++) {
 			
-			if(definicoes[i].contains(palavras[i])) {
+			String palavraTokenizada = palavrasTokenizadasDicionario.get(i);
+			
+			for (int j = 0; j < definicoesTokenizadasDicionario.size(); j++) {
 				
-				System.out.println(palavras[i].toString() + "->" + definicoes[i].toString());
+				ArrayList<String> definicaoTokenizada = definicoesTokenizadasDicionario.get(j);
 				
-			}
-		}
+				if(definicaoTokenizada.contains(palavraTokenizada)) {
+					
+					// Adicionar Arestas Aqui!!!!
+					System.out.println(palavrasDicionario.get(i) + " -> " + palavrasDicionario.get(j));
+				
+				
+				} // Fim if
+				
+				
+			} // Fim for int j = 0
+			
+		} // Fim for int i = 0
 		
-		
-		
+
 	} // Fim do método ConstroiGrafo
 	
-	
-	
-	
-	/**
-	 * Imprime todas as entradas do dicionario
-	 */
-	static void ImprimirDicionario() {
-		
-		for (Map.Entry<String, String> registro : dicionario.entrySet())
-			System.out.println(registro.getKey().toString() + "\t\t" + registro.getValue().toString());
-		
-	} // Fim do método ImprimeDicionario
 	
 	/**
 	 * @param arquivo Arquivo de entrada
