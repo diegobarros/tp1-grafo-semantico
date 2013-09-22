@@ -1,12 +1,12 @@
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import org.apache.lucene.analysis.*;
-import org.apache.lucene.analysis.standard.*;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.Version;
-
-
 
 
 /**
@@ -16,6 +16,7 @@ import org.apache.lucene.util.Version;
 public class SemanticGraph {
 	
 	static Map<String,String> dicionario;
+	static Map<String, ArrayList<String>> tokensDicionario;
 	
 	static LinkedList<String> palavrasOrigem;
 	static LinkedList<String> palavrasDestino;
@@ -29,6 +30,7 @@ public class SemanticGraph {
 	static void Inicializa(String[] parametros) {
 		
 		dicionario = new HashMap<String, String>();
+		tokensDicionario = new HashMap<String, ArrayList<String>>();
 		
 		palavrasOrigem = new LinkedList<String>();
 		palavrasDestino = new LinkedList<String>();
@@ -58,8 +60,14 @@ public class SemanticGraph {
 			definicoes.add(definicao[1].trim());
 		}
 		
-		// Remover StopWords
-		System.out.println("NÃO ESQUEÇA, Remover STOP WORDS!!!");
+		
+		try {
+			String[] palavrasDicionario = palavras.toArray(new String[palavras.size()]);
+			String[] definicoesDicionario = definicoes.toArray(new String[definicoes.size()]);
+			AnalisaDicionario(palavrasDicionario, definicoesDicionario);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		
 		// Adiciona os termos no dicionário (hashmap)
@@ -94,29 +102,89 @@ public class SemanticGraph {
 	/**
 	 * Analisa cada definição do dicionário, eliminando 
 	 * os termos desnecessários (Stop Words) </br>à busca
+	 * @throws IOException 
 	 */
-	static void AnalisaDicionario(String[] texto) {
+	static void AnalisaDicionario(String[] palavras, String[] definicoes) throws IOException {
+
 		
-		
-		
-		
-		
+		for (int i = 0; i < palavras.length; i++) {
+			
+			ArrayList<String> listaTokensDefinicoes = new ArrayList<String>();
+			
+			String[] tokensPalavras = AnalisaTexto(palavras[i]);
+			String[] tokensDefinicoes = AnalisaTexto(definicoes[i]);
+			
+			for(String definicao : tokensDefinicoes)
+				listaTokensDefinicoes.add(definicao);
+			
+			tokensDicionario.put(tokensPalavras[0], listaTokensDefinicoes);
+
+		}
+			
 	} // Fim do método AnalisaDicionario
 	
 	
 	
-	static String[] AnalisaTexto(String[] texto) {
+	/**
+	 * Realiza o pré-processamento do texto do dicionário
+	 * extraindo os tokens e fazendo o Stemming do texto.
+	 * @param texto O texto que está sendo analisado
+	 * @return Um vetor contendo todos os tokens do texto
+	 * @throws IOException
+	 */
+	static String[] AnalisaTexto(String texto) throws IOException {
 		
-		Analyzer analisador = new StandardAnalyzer(Version.LUCENE_44);
+		//Analyzer analisador = new SnowballAnalyzer(Version.LUCENE_44, "English", StopAnalyzer.ENGLISH_STOP_WORDS_SET);
+		Analyzer analisador = new EnglishAnalyzer(Version.LUCENE_44);
 		
+		TokenStream tokenStream =  analisador.tokenStream("contents", new StringReader(texto));
+		CharTermAttribute termo = tokenStream.addAttribute(CharTermAttribute.class);
+		
+		ArrayList<String> tokens = new ArrayList<String>();
+
 		System.out.println("Analisando: " + texto);
+		System.out.println("\t" + analisador.getClass().getName() + ":");
+        System.out.print("\t\t");
+         
+        tokenStream.reset();
+		
+		while (tokenStream.incrementToken()) {
+			System.out.print("[" + termo.toString() + "] ");
+			tokens.add(termo.toString());
+		}
+		
+		
+		System.out.println("\n\n");
+		tokenStream.end();
+		tokenStream.close();
+		analisador.close();
+		
+		return tokens.toArray(new String[tokens.size()]);
+		
+	} // Fim do método AnalisaTexto
+	
+	
+	
+	static void ConstroiGrafo() {
+		
+		int totalRegistros = tokensDicionario.size();
+		String[] palavras = tokensDicionario.keySet().toArray(new String[totalRegistros]);
+		ArrayList [] definicoes =  tokensDicionario.values().toArray(new ArrayList [totalRegistros]);
+		
+		for (int i = 0; i < palavras.length; i++) {
+			
+			if(definicoes[i].contains(palavras[i])) {
+				
+				System.out.println(palavras[i].toString() + "->" + definicoes[i].toString());
+				
+			}
+		}
 		
 		
 		
-		
-		
-		return null;
-	}
+	} // Fim do método ConstroiGrafo
+	
+	
 	
 	
 	/**
@@ -126,6 +194,7 @@ public class SemanticGraph {
 		
 		for (Map.Entry<String, String> registro : dicionario.entrySet())
 			System.out.println(registro.getKey().toString() + "\t\t" + registro.getValue().toString());
+		
 	} // Fim do método ImprimeDicionario
 	
 	/**
@@ -216,6 +285,7 @@ public class SemanticGraph {
 		Inicializa(args);
 		CarregaDicionario();
 		CarregaParesPalavras();
+		ConstroiGrafo();
 		
 	} // Fim do método Main
 
