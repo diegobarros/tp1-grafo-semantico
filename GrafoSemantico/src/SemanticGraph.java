@@ -1,12 +1,13 @@
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
 
 import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.Version;
+
+import grafos.*;
 
 
 /**
@@ -18,10 +19,11 @@ public class SemanticGraph {
 	// Dicionário e Mineração Textual
 	static ArrayList<String> palavrasDicionario;
 	static ArrayList<String> definicoesDicionario;
-	
-	static Map<String, ArrayList<String>> tokensDicionario;
 	static ArrayList<String> palavrasTokenizadasDicionario;
 	static ArrayList<ArrayList<String>> definicoesTokenizadasDicionario;
+	
+	// Grafos
+	static ArrayList<Aresta> arestasGrafo;
 	
 	
 	// Palavras de Origem e Destino
@@ -36,13 +38,12 @@ public class SemanticGraph {
 	
 	
 	static void Inicializa(String[] parametros) {
-		
-		//dicionario = new HashMap<String, String>();
-		
+
 		palavrasDicionario = new ArrayList<String>();
 		definicoesDicionario = new ArrayList<String>();
 		
-		//tokensDicionario = new HashMap<String, ArrayList<String>>();
+		arestasGrafo = new ArrayList<Aresta>();
+
 		palavrasTokenizadasDicionario = new ArrayList<String>();
 		definicoesTokenizadasDicionario = new ArrayList<ArrayList<String>>();
 		
@@ -122,16 +123,13 @@ public class SemanticGraph {
 			for(String definicao : tokensDefinicoes)
 				listaTokensDefinicoes.add(definicao);
 			
-			
 			palavrasTokenizadasDicionario.add(tokensPalavras[0]);
 			definicoesTokenizadasDicionario.add(listaTokensDefinicoes);
-			
-			//tokensDicionario.put(tokensPalavras[0], listaTokensDefinicoes);
 
-		}
+
+		} // Fim for int i = 0
 			
 	} // Fim do método AnalisaDicionario
-	
 	
 	
 	/**
@@ -162,7 +160,6 @@ public class SemanticGraph {
 			tokens.add(termo.toString());
 		}
 		
-		
 		System.out.println("\n\n");
 		tokenStream.end();
 		tokenStream.close();
@@ -176,6 +173,8 @@ public class SemanticGraph {
 	
 	static void ConstroiGrafo() {
 		
+		System.out.println(".:: Criando Arestas ::.\n");
+		
 		for (int i = 0; i < palavrasTokenizadasDicionario.size(); i++) {
 			
 			String palavraTokenizada = palavrasTokenizadasDicionario.get(i);
@@ -184,19 +183,18 @@ public class SemanticGraph {
 				
 				ArrayList<String> definicaoTokenizada = definicoesTokenizadasDicionario.get(j);
 				
-				if(definicaoTokenizada.contains(palavraTokenizada)) {
+				if(definicaoTokenizada.contains(palavraTokenizada) && (i != j)) {		
 					
-					// Adicionar Arestas Aqui!!!!
-					System.out.println(palavrasDicionario.get(i) + " -> " + palavrasDicionario.get(j));
-				
-				
+					arestasGrafo.add(new Aresta(i, j, 0.0, palavrasDicionario.get(i), palavrasDicionario.get(j)));
+					System.out.println("[" + i + "] " + palavrasDicionario.get(i) + " -> " + "[" + j + "] " + palavrasDicionario.get(j));
+			
 				} // Fim if
-				
 				
 			} // Fim for int j = 0
 			
+			System.out.print("\n");
+			
 		} // Fim for int i = 0
-		
 
 	} // Fim do método ConstroiGrafo
 	
@@ -294,7 +292,6 @@ public class SemanticGraph {
 	} // Fim do método Main
 
 } // Fim da classe SemanticGraph
-
 
 
 /*
