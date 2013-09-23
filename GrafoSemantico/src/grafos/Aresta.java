@@ -44,6 +44,21 @@ public class Aresta implements Comparable<Aresta> {
 		this.rotuloVerticeInicial = rotuloVerticeIncial;
 		this.rotuloVerticeFinal = rotuloVerticeFinal;
 	}
+	
+	/**
+	 * @param u O ponto Inicial da Aresta
+	 * @param v O ponto Final da Aresta
+	 * @param rotuloVerticeIncial O ró
+	 * @param rotuloVerticeFinal
+	 */
+	public Aresta(int u, int v, String rotuloVerticeIncial,
+			String rotuloVerticeFinal) {
+		this.u = u;
+		this.v = v;
+		this.peso = 0.0d;
+		this.rotuloVerticeInicial = rotuloVerticeIncial;
+		this.rotuloVerticeFinal = rotuloVerticeFinal;
+	}
 
 	/**
 	 * @return o Ponto inicial (vértice) da Aresta
@@ -76,14 +91,14 @@ public class Aresta implements Comparable<Aresta> {
 	/**
 	 * @return O rótulo do vértice inicial da Aresta
 	 */
-	public String getRotuloVerticeIncial() {
+	public String getRotuloVerticeInicial() {
 		return rotuloVerticeInicial;
 	}
 
 	/**
 	 * @param  O rótulo do vértice final da aresta
 	 */
-	public void setRotuloVerticeIncial(String rotuloVerticeIncial) {
+	public void setRotuloVerticeInicial(String rotuloVerticeIncial) {
 		this.rotuloVerticeInicial = rotuloVerticeIncial;
 	}
 
@@ -100,7 +115,10 @@ public class Aresta implements Comparable<Aresta> {
 	public void setRotuloVerticeFinal(String rotuloVerticeFinal) {
 		this.rotuloVerticeFinal = rotuloVerticeFinal;
 	}
-
+	
+	public int NoFonte() {
+		return u;
+	}
 	
 	/**
 	 * Retorna o outro ponto da aresta dado um vértice.
@@ -115,6 +133,22 @@ public class Aresta implements Comparable<Aresta> {
 			return u;
 		else throw new IllegalArgumentException("Ponto Final Inválido ou Inexistente!");
 	}
+	
+	
+	/**
+	 * Dado um vértice inteiro, retorna sua representação em string
+	 * @param vertice Um vértice inteiro
+	 * @return rótulo do vértice
+	 */
+	public String ObtemRotuloVertice(int vertice) {
+		if (vertice == u)
+			return rotuloVerticeInicial;
+		else if (vertice == v)
+			return rotuloVerticeFinal;
+		else
+			return null;
+		
+	} // Fim do método ObtemRotuloVertice
 	
 	@Override
 	public int compareTo(Aresta aresta) {
@@ -133,7 +167,14 @@ public class Aresta implements Comparable<Aresta> {
 	 */
 	@Override
 	public String toString() {
-		return String.format("%d - %d %.5f", u, v, peso);
+		StringBuilder stringBuilder = new StringBuilder();
+
+		stringBuilder.append(getRotuloVerticeInicial());
+		stringBuilder.append(", ");
+		stringBuilder.append(getRotuloVerticeFinal());
+		stringBuilder.append(", ");
+		
+		return stringBuilder.toString();
 	}
 
 

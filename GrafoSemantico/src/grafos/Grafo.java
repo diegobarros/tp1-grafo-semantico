@@ -7,16 +7,16 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 /**
- * A classe <tt>Grafo</tt> representa um grafo não direcionado de vértices denominados de 0 (zero) até |V| - 1.
+ * A classe <tt>GrafoTextual</tt> representa um grafo não direcionado de vértices no formato textual de 0 (zero) até |V| - 1.
  * @author Diego Augusto de Faria Barros
  */
 public class Grafo {
 	
-	
+
 	private int numeroDeVertices;
 	private int numeroDeArestas;
 	
-	private ArrayList<Integer>[] listaAdj;
+	private ArrayList<Aresta>[] listaAdj;
 
 
 	/**
@@ -32,10 +32,10 @@ public class Grafo {
 			this.numeroDeVertices = numeroDeVertices;
 			this.numeroDeArestas = 0;
 			
-			listaAdj = (ArrayList<Integer>[]) new ArrayList[numeroDeVertices];
+			listaAdj = (ArrayList<Aresta>[]) new ArrayList[numeroDeVertices];
 			
-			for (int u = 0; u < listaAdj.length; u++)
-				listaAdj[u] = new ArrayList<Integer>();
+			for (int u = 0; u < numeroDeVertices; u++)
+				listaAdj[u] = new ArrayList<Aresta>();
 			
 		} else {
 			throw new IllegalArgumentException("O númeo de Vértices deve ser positivo!");
@@ -62,11 +62,15 @@ public class Grafo {
 				
 				int u = (int) (Math.random() * numeroDeVertices);
 				int v = (int) (Math.random() * numeroDeVertices);
-				AdicionaAresta(u, v);
+				
+				double peso = Math.round(100 * Math.random()) / 100.00;
+				
+				Aresta aresta = new Aresta(u, v, peso);
+				AdicionaAresta(aresta);
 				
 			} // Fim for int i = 0
 			
-		} // Fim de if 
+		} // fim de if 
 
 	} // Fim do Construtor
 	
@@ -90,20 +94,15 @@ public class Grafo {
 	 * @param v Vértice destino da aresta
 	 * @throws java.lang.IndexOutOfBoundsException ao menos que ambos 0 <= u < V E 0 <= v < V
 	 */
-	public void AdicionaAresta(int u, int v) {
+	public void AdicionaAresta(Aresta aresta) {
 		
-		if (u < 0 || u >= numeroDeVertices)
-			throw new IndexOutOfBoundsException();
-		else if (v < 0 || v >= numeroDeVertices)
-			throw new IndexOutOfBoundsException();
-		else {
-			
-			numeroDeArestas++;	// Incrementa o número de arestas
-			listaAdj[u].add(v);	// Adiciona uma aresta de u para v
-			listaAdj[v].add(u); // Adiciona outra resta de v para u
-			
-		} // Fim de if/else
-		
+		int u = aresta.NoFonte();
+		int v = aresta.OutroVertice(u);
+
+		listaAdj[u].add(aresta);	// Adiciona uma aresta de u para v
+		listaAdj[v].add(aresta); 	// Adiciona outra resta de v para u
+		numeroDeArestas++;			// Incrementa o número de arestasv	
+
 	} // Fim do método AdicionaAresta
 
 
@@ -116,21 +115,25 @@ public class Grafo {
 		this(grafo.getNumeroDeVertices());
 		this.numeroDeArestas = grafo.getNumeroDeArestas();
 		
-		for (int u = 0; u < grafo.numeroDeVertices; u++) {
+		for (int u = 0; u < grafo.getNumeroDeVertices(); u++) {
 			
 			// Mantém a lista de Adj. na mesma ordem da original
-			Stack<Integer> pilha = new Stack<Integer>();
+			Stack<Aresta> pilha = new Stack<Aresta>();
 			
-			for (int v : grafo.listaAdj[u])
-				pilha.push(v);
 			
-			for (int v : pilha)
-				listaAdj[u].add(v);
+			for (Aresta aresta : grafo.listaAdj[u])
+				pilha.push(aresta);
+			
+			for (Aresta aresta : pilha)
+				listaAdj[u].add(aresta);
 			
 		} // Fim for u = 0
 		
 	} // Fim do construtor Grafo
 	
+	public Iterable<Aresta> Adjacencias(int u) {
+		return listaAdj[u];
+	}
 	
 	/**
 	 * Obtém a lista dos vizinhos do vértice u com um Iterable
@@ -138,14 +141,69 @@ public class Grafo {
 	 * @return a lista dos vizinhos do vértice u com um Iterable
 	 * @throws java.lang.IndexOutOfBoundsException ao menos que 0 <= u < |V|
 	 */
-	public Iterable<Integer> VizinhosAdjacentes(int u) {
+	public Iterable<Aresta> Arestas() {
 		
-		if (u < 0 || u >= numeroDeVertices)
-			throw new IndexOutOfBoundsException();
-		else
-			return listaAdj[u];
+		ArrayList<Aresta> listaArestas = new ArrayList<Aresta>();
+		
+		for (int u = 0; u < numeroDeVertices; u++) {
+			
+			int selfLoops = 0;
+			
+			for (Aresta aresta : Adjacencias(u)) {
+				
+				if(aresta.OutroVertice(u) > u) 
+					listaArestas.add(aresta);
+				else if (aresta.OutroVertice(u) == u) {
+					if ((selfLoops % 2 == 0))
+						listaArestas.add(aresta);
+					
+					selfLoops++;
+					
+				} // Fim if/else
+				
+			} // Fim de foreach
+			
+		} // Fim for int i = 0
+		
+		return listaArestas;
 		
 	} // Fim do método VizinhosAdjacentes
+	
+	
+	public String ImprimeListaAdj() {
+		
+		StringBuilder stringBuilder = new StringBuilder();
+		ArrayList<String> palavras = new ArrayList<String>();
+		
+		for (int u = 0; u < listaAdj.length; u++) {
+			
+			for (Aresta aresta : listaAdj[u]) {
+
+				if (!palavras.contains(aresta.getRotuloVerticeInicial()))
+					palavras.add(aresta.getRotuloVerticeInicial());
+				else if (!palavras.contains(aresta.getRotuloVerticeFinal()))
+					palavras.add(aresta.getRotuloVerticeFinal());
+			}
+		}
+		
+		
+		
+		for (int u = 0; u < listaAdj.length; u++) {
+			
+			String palavra = palavras.get(u);
+			stringBuilder.append("[" + u + "] " + palavra + " -> ");
+			
+			for (Aresta aresta : listaAdj[u]) {
+				
+				if (!aresta.getRotuloVerticeInicial().equals(palavra))
+					stringBuilder.append(aresta.getRotuloVerticeFinal() + "  ");
+			}
+			
+			stringBuilder.append("\n");
+		}
+		
+		return stringBuilder.toString();
+	}
 
 	/** 
 	 * A representação em string do Grafo
@@ -159,10 +217,11 @@ public class Grafo {
 		
 		for (int u = 0; u < numeroDeVertices; u++) {
 			
-			stringBuilder.append(u + "  ");
+			stringBuilder.append(" ["+ u + "]   ");
 			
-			for (int v : listaAdj[u])
-				stringBuilder.append(v + " ");
+			
+			for (Aresta aresta : listaAdj[u])
+				stringBuilder.append(aresta + " ");
 			
 			stringBuilder.append("\n");
 			
@@ -172,7 +231,6 @@ public class Grafo {
 		
 		return stringBuilder.toString();
 		
-	} // Fim do método toString();
-	
-	
-} // Fim da classe Grafo
+	} // Fim do método toString();}
+
+} // Fim da Classe GrafoTextual

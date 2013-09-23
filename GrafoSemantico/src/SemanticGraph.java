@@ -8,6 +8,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.Version;
 
 import grafos.*;
+import grafos.algoritmos.BuscaEmLargura;
 
 
 /**
@@ -24,6 +25,7 @@ public class SemanticGraph {
 	
 	// Grafos
 	static ArrayList<Aresta> arestasGrafo;
+	static Grafo grafo;
 	
 	
 	// Palavras de Origem e Destino
@@ -173,6 +175,42 @@ public class SemanticGraph {
 	
 	static void ConstroiGrafo() {
 		
+		CriaArestas();
+		
+		int numeroVertices = palavrasDicionario.size();
+		grafo = new Grafo(numeroVertices);
+		
+		for (Aresta aresta : arestasGrafo) {
+			grafo.AdicionaAresta(aresta);
+		}
+			
+		//System.out.println(grafo.ImprimeListaAdj());
+		
+		BuscaEmLargura buscaEmLargura = new BuscaEmLargura(grafo, 0);
+		
+		for (int u = 0; u <	 grafo.getNumeroDeVertices(); u++) {
+			if (buscaEmLargura.ExisteCaminhoPara(u)) {
+				
+				System.out.println(String.format("%d para %d (%d):  ", 0, u, buscaEmLargura.DistanciaPara(u)));
+				
+				for (int  v : buscaEmLargura.CaminhoPara(u)) {
+					if (v == 0)
+						System.out.println(v);
+					else
+						System.out.print("-" + v);
+				}
+			} else {
+				System.out.println(String.format("%d para %d (-):  Não conectado\n", 0, u));
+			}
+		}
+
+	} // Fim do método ConstroiGrafo
+	
+	/**
+	 * Cria as arestas do grafo
+	 */
+	static void CriaArestas() {
+		
 		System.out.println(".:: Criando Arestas ::.\n");
 		
 		for (int i = 0; i < palavrasTokenizadasDicionario.size(); i++) {
@@ -195,9 +233,8 @@ public class SemanticGraph {
 			System.out.print("\n");
 			
 		} // Fim for int i = 0
-
-	} // Fim do método ConstroiGrafo
-	
+				
+	} // Fim do método CriaArestas
 	
 	/**
 	 * @param arquivo Arquivo de entrada
