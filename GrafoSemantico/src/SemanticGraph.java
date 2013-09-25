@@ -185,22 +185,31 @@ public class SemanticGraph {
 		}
 			
 		//System.out.println(grafo.ImprimeListaAdj());
+		ArrayList<Integer> nosFontes = new ArrayList<Integer>();
+		for (int i = 0; i < grafo.getNumeroDeVertices(); i++)
+			nosFontes.add(i);
 		
-		BuscaEmLargura buscaEmLargura = new BuscaEmLargura(grafo, 0);
+//		System.out.println(grafo.ImprimeListaAdj());
+		
+		BuscaEmLargura buscaEmLargura = new BuscaEmLargura(grafo, nosFontes);
 		
 		for (int u = 0; u <	 grafo.getNumeroDeVertices(); u++) {
+			
 			if (buscaEmLargura.ExisteCaminhoPara(u)) {
 				
-				System.out.println(String.format("%d para %d (%d):  ", 0, u, buscaEmLargura.DistanciaPara(u)));
+				System.out.print(String.format("%d para %d (%d):  ", 3, u, buscaEmLargura.DistanciaPara(u)));
 				
 				for (int  v : buscaEmLargura.CaminhoPara(u)) {
-					if (v == 0)
-						System.out.println(v);
+					if (v == 3)
+						System.out.print(v);
 					else
 						System.out.print("-" + v);
 				}
+				
+				System.out.println();
+				
 			} else {
-				System.out.println(String.format("%d para %d (-):  Não conectado\n", 0, u));
+				System.out.println(String.format("%d para %d (-):  Não conectado\n", 3, u));
 			}
 		}
 

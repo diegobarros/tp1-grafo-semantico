@@ -193,10 +193,15 @@ public class Grafo {
 			String palavra = palavras.get(u);
 			stringBuilder.append("[" + u + "] " + palavra + " -> ");
 			
-			for (Aresta aresta : listaAdj[u]) {
+			
+ 			
+			for (Aresta aresta : Arestas()) {
 				
-				if (!aresta.getRotuloVerticeInicial().equals(palavra))
+				if (aresta.getRotuloVerticeInicial().equals(palavra))
 					stringBuilder.append(aresta.getRotuloVerticeFinal() + "  ");
+				else
+					stringBuilder.append(aresta.getRotuloVerticeInicial() + "  ");
+					
 			}
 			
 			stringBuilder.append("\n");

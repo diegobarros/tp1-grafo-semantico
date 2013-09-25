@@ -81,7 +81,7 @@ public class BuscaEmLargura {
 		
 		
 		distanciaPara[noFonte] = 0;
-		marcado[noFonte] = true;
+		marcado[noFonte] = false;
 		lista.add(noFonte);
 		
 		while (!lista.isEmpty()) {
@@ -89,6 +89,21 @@ public class BuscaEmLargura {
 			int u = lista.removeFirst();
 			
 			for (Aresta aresta : grafo.Adjacencias(u)) {
+				
+				/*
+				if(!marcado[aresta.getV()]) {
+					
+					arestaPara[aresta.getV()] = aresta.getU();
+					distanciaPara[aresta.getV()] = distanciaPara[aresta.getU()] + 1;
+					marcado[aresta.getV()] = true;
+					lista.add(aresta.getV());
+					
+				} // Fim de if
+				*/
+				
+				
+				
+				
 				
 				if(!marcado[aresta.getV()]) {
 					
@@ -117,7 +132,7 @@ public class BuscaEmLargura {
 	
 		for (int noFonte : nosFontes) {
 		
-			marcado[noFonte] = true;
+			marcado[noFonte] = false;
 			distanciaPara[noFonte] = 0;
 			lista.add(noFonte);
 		
@@ -181,12 +196,12 @@ public class BuscaEmLargura {
 		if (ExisteCaminhoPara(u)) {
 			
 			Stack <Integer> caminho = new Stack<Integer>();
-			int i;
 			
-			for (i = u; distanciaPara[i] != 0; i = arestaPara[i])
+			
+			for (int i = u; distanciaPara[i] != 0; i = arestaPara[i])
 				caminho.push(i);
 			
-			caminho.push(i);
+			caminho.push(distanciaPara[u]);
 			return caminho;
 			
 		} else {
