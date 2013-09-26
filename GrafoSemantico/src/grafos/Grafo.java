@@ -237,6 +237,33 @@ public class Grafo {
 	} // Fim do método ObtemResultadosVertices
 	
 	
+	
+	/**
+	 * Dado um vetor de rótulos, retorna os valores inteiros referente a eles
+	 * @param rotulosVertices
+	 * @return
+	 */
+	public Integer[] ObtemVerticesInteiros(String[] rotulosVertices) {
+		
+		ArrayList<Integer> verticesInteiros = new ArrayList<Integer>();
+		String[] nomesDosVertices = ObtemRotulosVertices();
+		
+		for (int i = 0; i < rotulosVertices.length; i++) {
+			
+			for (int j = 0; j < nomesDosVertices.length; j++) {
+				
+				if(rotulosVertices[i].equalsIgnoreCase(nomesDosVertices[j]))
+					verticesInteiros.add(j);
+				
+			} // Fim for int j = 0
+
+		} // Fim for int i = 0
+		
+		return verticesInteiros.toArray(new Integer[verticesInteiros.size()]);
+		
+		
+	} // Fim do método ObtemVerticesInteiros
+	
 	/**
 	 * Obtém uma string que representa a lista de adjacências do grafo
 	 * @return String que representa a lista de adjacências do grafo

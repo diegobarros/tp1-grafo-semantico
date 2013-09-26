@@ -1,6 +1,7 @@
+import java.util.ArrayList;
+
 import grafos.Grafo;
 import grafos.algoritmos.*;
-
 
 
 /**
@@ -12,9 +13,15 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	private String palavra1;
 	private String palavra2;
 	
+	private String[] palavrasOrigem;
+	private String[] palavrasDestino;
+	
 	private Grafo grafoDePalavras;
 
 	private int numeroDeClusters;
+	
+	
+	private ArrayList<Double> similaridades;
 	
 	
 	/**
@@ -30,6 +37,29 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 		this.grafoDePalavras = grafoDePalavras;
 		this.numeroDeClusters = numeroDeClusters;
 	}
+	
+	
+
+	/**
+	 * @param palavrasOrigem
+	 * @param palavrasDestino
+	 * @param grafoDePalavras
+	 * @param numeroDeClusters
+	 */
+	public SimilaridadeSemantica(String[] palavrasOrigem,
+			String[] palavrasDestino, Grafo grafoDePalavras,
+			int numeroDeClusters) {
+		this.palavrasOrigem = palavrasOrigem;
+		this.palavrasDestino = palavrasDestino;
+		this.grafoDePalavras = grafoDePalavras;
+		this.numeroDeClusters = numeroDeClusters;
+		
+		similaridades = new ArrayList<Double>(palavrasOrigem.length);
+		CalculaSimilaridades();
+		
+	} // Fim do contrutor
+
+
 
 	/**
 	 * @return the palavra1
@@ -79,14 +109,33 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	public Grafo getGrafoDePalavras() {
 		return grafoDePalavras;
 	}
+	
+	
+	
+	
+	
+	/**
+	 * Mede a similaridade entre os pares de palavras fornecidas como parametro
+	 */
+	private void CalculaSimilaridades() {
+		
+		for (int i = 0; i < palavrasOrigem.length; i++) {
+			
+			similaridades.add(Sim(palavrasOrigem[i], palavrasDestino[i]));
+			
+			
+		} // Fim de for int i = 0
+		
+	} // Fim do método CalculaSimilaridades
+	
+	
 
 	/* (non-Javadoc)
 	 * @see SimilaridadeSemanticaPalavras#Sim(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public double Sim(String w1, String w2) {
-		// TODO Auto-generated method stub
-		return 0;
+		return (1 / Len(w1, w2));
 	}
 
 	/* (non-Javadoc)
@@ -94,9 +143,44 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	 */
 	@Override
 	public double Len(String w1, String w2) {
-		// TODO Auto-generated method stub
+		
+		
+		Integer[] verticesOrigem = grafoDePalavras.ObtemVerticesInteiros(palavrasOrigem);
+		
+		int fonte = 0;
+		BuscaEmLargura buscaEmLargura = new BuscaEmLargura(grafoDePalavras, fonte);
+		
+		
+		
+		for (int u = 0; u <	 grafoDePalavras.getNumeroDeVertices(); u++) {
+			
+			if (buscaEmLargura.ExisteCaminhoPara(u)) {
+				
+				System.out.print(String.format("%d para %d (%d):  ", fonte, u, buscaEmLargura.DistanciaPara(u)));
+				
+				for (int  v : buscaEmLargura.CaminhoPara(u)) {
+					if (v == fonte)
+						System.out.print(v);
+					else
+						System.out.print("-" + v);
+				}
+				
+				System.out.println();
+				
+			} else {
+				System.out.println(String.format("%d para %d (-):  Não conectado\n", fonte, u));
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
 		return 0;
-	}
+		
+	} // Fim do método Len
 
 } // Fim da Classe SimilaridadeSemantica
 

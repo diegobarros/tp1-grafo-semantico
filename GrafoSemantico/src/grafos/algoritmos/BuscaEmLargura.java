@@ -46,7 +46,7 @@ public class BuscaEmLargura {
 	
 
 	/**
-	 * Computa o menor caminho de de qualquer dos nós fontes para todos os outros vértices no grafo
+	 * Computa o menor caminho de qualquer dos nós fontes para todos os outros vértices no grafo
 	 * @param grafo O grafo
 	 * @param nosFontes Os nós fontes
 	 */
@@ -81,36 +81,21 @@ public class BuscaEmLargura {
 		
 		
 		distanciaPara[noFonte] = 0;
-		marcado[noFonte] = false;
+		marcado[noFonte] = true;
 		lista.add(noFonte);
 		
 		while (!lista.isEmpty()) {
 			
 			int u = lista.removeFirst();
 			
-			for (Aresta aresta : grafo.Adjacencias(u)) {
+			for (int v : grafo.AdjacenciasInt(u)) {
 				
-				/*
-				if(!marcado[aresta.getV()]) {
+				if(!marcado[v]) {
 					
-					arestaPara[aresta.getV()] = aresta.getU();
-					distanciaPara[aresta.getV()] = distanciaPara[aresta.getU()] + 1;
-					marcado[aresta.getV()] = true;
-					lista.add(aresta.getV());
-					
-				} // Fim de if
-				*/
-				
-				
-				
-				
-				
-				if(aresta.getU() == u && !marcado[aresta.getV()]) {
-					
-					arestaPara[aresta.getV()] = u;
-					distanciaPara[aresta.getV()] = distanciaPara[u] + 1;
-					marcado[aresta.getV()] = true;
-					lista.add(aresta.getV());
+					arestaPara[v] = u;
+					distanciaPara[v] = distanciaPara[u] + 1;
+					marcado[v] = true;
+					lista.add(v);
 					
 				} // Fim de if
 				
@@ -193,21 +178,20 @@ public class BuscaEmLargura {
 	 */
 	public Iterable <Integer> CaminhoPara(int u) {
 		
-		if (ExisteCaminhoPara(u)) {
-			
-			Stack <Integer> caminho = new Stack<Integer>();
-			
-			
-			for (int i = u; distanciaPara[i] != 0; i = arestaPara[i])
-				caminho.push(i);
-			
-			caminho.push(distanciaPara[u]);
-			return caminho;
-			
-		} else {
+		if (!ExisteCaminhoPara(u))
 			return null;
 			
-		} // Fim if/else
+		Stack <Integer> caminho = new Stack<Integer>();
+			
+		int i;
+			
+		for (i = u; distanciaPara[i] != 0; i = arestaPara[i])
+			caminho.push(i);
+			
+		caminho.push(i);
+			
+		return caminho;
+		
 		
 	} // Fim do método CaminhoPara
 	

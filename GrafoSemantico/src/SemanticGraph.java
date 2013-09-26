@@ -29,6 +29,8 @@ public class SemanticGraph {
 	// Palavras de Origem e Destino
 	static LinkedList<String> palavrasOrigem;
 	static LinkedList<String> palavrasDestino;
+	
+	static int numeroClusters;
 
 	// Entrada/Saída dos Dados
 	static File arquivoDicionario;
@@ -53,6 +55,7 @@ public class SemanticGraph {
 		arquivoDicionario = new File(parametros[0]);
 		arquivoParesPalavras = new File(parametros[1]);
 		
+		numeroClusters = Integer.parseInt(parametros[4]);
 		
 	} // Fim do método Inicializa
 	
@@ -227,6 +230,11 @@ public class SemanticGraph {
 	 * Mede a similiridade semântica entre duas palavras no grafo
 	 */
 	static void MedeSimilaridadeSemantica() {
+		
+		String[] palavras1 = palavrasOrigem.toArray(new String[palavrasOrigem.size()]);
+		String[] palavras2 = palavrasDestino.toArray(new String[palavrasDestino.size()]);
+		
+		SimilaridadeSemantica similaridadeSemantica = new SimilaridadeSemantica(palavras1, palavras2, grafo, numeroClusters);
 		
 	} // Fim do método CalculaSimilaridadeSemantica
 	
