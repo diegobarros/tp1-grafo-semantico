@@ -8,8 +8,6 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.Version;
 
 import grafos.*;
-import grafos.algoritmos.BuscaEmLargura;
-
 
 /**
  * @author Diego Augusto de Faria Barros</br>
@@ -143,7 +141,6 @@ public class SemanticGraph {
 	 */
 	static String[] AnalisaTexto(String texto) throws IOException {
 		
-		//Analyzer analisador = new SnowballAnalyzer(Version.LUCENE_44, "English", StopAnalyzer.ENGLISH_STOP_WORDS_SET);
 		Analyzer analisador = new EnglishAnalyzer(Version.LUCENE_44);
 		
 		TokenStream tokenStream =  analisador.tokenStream("contents", new StringReader(texto));
@@ -172,49 +169,6 @@ public class SemanticGraph {
 	} // Fim do método AnalisaTexto
 	
 	
-	
-	static void ConstroiGrafo() {
-		
-		CriaArestas();
-		
-		int numeroVertices = palavrasDicionario.size();
-		grafo = new Grafo(numeroVertices);
-		
-		for (Aresta aresta : arestasGrafo) {
-			grafo.AdicionaAresta(aresta);
-		}
-			
-		//System.out.println(grafo.ImprimeListaAdj());
-		ArrayList<Integer> nosFontes = new ArrayList<Integer>();
-		for (int i = 0; i < grafo.getNumeroDeVertices(); i++)
-			nosFontes.add(i);
-		
-//		System.out.println(grafo.ImprimeListaAdj());
-		
-		BuscaEmLargura buscaEmLargura = new BuscaEmLargura(grafo, nosFontes);
-		
-		for (int u = 0; u <	 grafo.getNumeroDeVertices(); u++) {
-			
-			if (buscaEmLargura.ExisteCaminhoPara(u)) {
-				
-				System.out.print(String.format("%d para %d (%d):  ", 3, u, buscaEmLargura.DistanciaPara(u)));
-				
-				for (int  v : buscaEmLargura.CaminhoPara(u)) {
-					if (v == 3)
-						System.out.print(v);
-					else
-						System.out.print("-" + v);
-				}
-				
-				System.out.println();
-				
-			} else {
-				System.out.println(String.format("%d para %d (-):  Não conectado\n", 3, u));
-			}
-		}
-
-	} // Fim do método ConstroiGrafo
-	
 	/**
 	 * Cria as arestas do grafo
 	 */
@@ -222,18 +176,18 @@ public class SemanticGraph {
 		
 		System.out.println(".:: Criando Arestas ::.\n");
 		
-		for (int i = 0; i < palavrasTokenizadasDicionario.size(); i++) {
+		for (int u = 0; u < palavrasTokenizadasDicionario.size(); u++) {
 			
-			String palavraTokenizada = palavrasTokenizadasDicionario.get(i);
+			String palavraTokenizada = palavrasTokenizadasDicionario.get(u);
 			
-			for (int j = 0; j < definicoesTokenizadasDicionario.size(); j++) {
+			for (int v = 0; v < definicoesTokenizadasDicionario.size(); v++) {
 				
-				ArrayList<String> definicaoTokenizada = definicoesTokenizadasDicionario.get(j);
+				ArrayList<String> definicaoTokenizada = definicoesTokenizadasDicionario.get(v);
 				
-				if(definicaoTokenizada.contains(palavraTokenizada) && (i != j)) {		
+				if(definicaoTokenizada.contains(palavraTokenizada) && (u != v)) {		
 					
-					arestasGrafo.add(new Aresta(i, j, 0.0, palavrasDicionario.get(i), palavrasDicionario.get(j)));
-					System.out.println("[" + i + "] " + palavrasDicionario.get(i) + " -> " + "[" + j + "] " + palavrasDicionario.get(j));
+					arestasGrafo.add(new Aresta(u, v, 0.0, palavrasDicionario.get(u), palavrasDicionario.get(v)));
+					System.out.println("[" + u + "] " + palavrasDicionario.get(u) + " -> " + "[" + v + "] " + palavrasDicionario.get(v));		
 			
 				} // Fim if
 				
@@ -244,6 +198,38 @@ public class SemanticGraph {
 		} // Fim for int i = 0
 				
 	} // Fim do método CriaArestas
+	
+	
+
+	/**
+	 * Constrói o grafo de palavras
+	 */
+	static void ConstroiGrafo() {
+		
+		CriaArestas();
+		
+		int numeroVertices = palavrasDicionario.size();
+		grafo = new Grafo(numeroVertices);
+		
+		
+		for (Aresta aresta : arestasGrafo)
+			grafo.AdicionaAresta(aresta);
+		
+
+		System.out.println("\n.:: Grafo - Lista de Adjacências ::.\n");
+		System.out.println(grafo.ListaAdjString());
+
+		
+	} // Fim do método ConstroiGrafo
+	
+	
+	/**
+	 * Mede a similiridade semântica entre duas palavras no grafo
+	 */
+	static void MedeSimilaridadeSemantica() {
+		
+	} // Fim do método CalculaSimilaridadeSemantica
+	
 	
 	/**
 	 * @param arquivo Arquivo de entrada
@@ -331,9 +317,12 @@ public class SemanticGraph {
 	public static void main(String[] args) {
 		
 		Inicializa(args);
+		
 		CarregaDicionario();
 		CarregaParesPalavras();
+		
 		ConstroiGrafo();
+		MedeSimilaridadeSemantica();
 		
 	} // Fim do método Main
 

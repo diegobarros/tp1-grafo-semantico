@@ -51,12 +51,12 @@ public class Aresta implements Comparable<Aresta> {
 	 * @param rotuloVerticeIncial O ró
 	 * @param rotuloVerticeFinal
 	 */
-	public Aresta(int u, int v, String rotuloVerticeIncial,
+	public Aresta(int u, int v, String rotuloVerticeInicial,
 			String rotuloVerticeFinal) {
 		this.u = u;
 		this.v = v;
 		this.peso = 0.0d;
-		this.rotuloVerticeInicial = rotuloVerticeIncial;
+		this.rotuloVerticeInicial = rotuloVerticeInicial;
 		this.rotuloVerticeFinal = rotuloVerticeFinal;
 	}
 
@@ -98,8 +98,8 @@ public class Aresta implements Comparable<Aresta> {
 	/**
 	 * @param  O rótulo do vértice final da aresta
 	 */
-	public void setRotuloVerticeInicial(String rotuloVerticeIncial) {
-		this.rotuloVerticeInicial = rotuloVerticeIncial;
+	public void setRotuloVerticeInicial(String rotuloVerticeInicial) {
+		this.rotuloVerticeInicial = rotuloVerticeInicial;
 	}
 
 	/**
@@ -169,10 +169,14 @@ public class Aresta implements Comparable<Aresta> {
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
 
-		stringBuilder.append(getRotuloVerticeInicial());
+		stringBuilder.append(" <");
+		stringBuilder.append(getU());
 		stringBuilder.append(", ");
-		stringBuilder.append(getRotuloVerticeFinal());
+		stringBuilder.append(getV());
 		stringBuilder.append(", ");
+		stringBuilder.append(getPeso());
+		stringBuilder.append("> ");
+		
 		
 		return stringBuilder.toString();
 	}

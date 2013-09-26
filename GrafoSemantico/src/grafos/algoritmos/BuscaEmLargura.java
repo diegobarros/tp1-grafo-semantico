@@ -105,7 +105,7 @@ public class BuscaEmLargura {
 				
 				
 				
-				if(!marcado[aresta.getV()]) {
+				if(aresta.getU() == u && !marcado[aresta.getV()]) {
 					
 					arestaPara[aresta.getV()] = u;
 					distanciaPara[aresta.getV()] = distanciaPara[u] + 1;
@@ -144,7 +144,7 @@ public class BuscaEmLargura {
 		
 			for (Aresta aresta : grafo.Adjacencias(u)) {
 			
-				if(!marcado[aresta.getV()]) {
+				if(aresta.getU() == u && !marcado[aresta.getV()]) {
 				
 					arestaPara[aresta.getV()] = u;
 					distanciaPara[aresta.getV()] = distanciaPara[u] + 1;

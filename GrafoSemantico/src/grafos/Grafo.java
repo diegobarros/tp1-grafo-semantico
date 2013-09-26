@@ -17,7 +17,9 @@ public class Grafo {
 	private int numeroDeArestas;
 	
 	private ArrayList<Aresta>[] listaAdj;
-
+	private ArrayList<Integer>[] listaAdjInt;
+	
+	private ArrayList<Aresta> arestas;
 
 	/**
 	 * Cria um novo grafo vazio com V vértices e 0 Arestas
@@ -31,11 +33,17 @@ public class Grafo {
 			
 			this.numeroDeVertices = numeroDeVertices;
 			this.numeroDeArestas = 0;
+			arestas = new ArrayList<Aresta>();
 			
 			listaAdj = (ArrayList<Aresta>[]) new ArrayList[numeroDeVertices];
+			listaAdjInt = (ArrayList<Integer>[]) new ArrayList[numeroDeVertices];
 			
-			for (int u = 0; u < numeroDeVertices; u++)
+			for (int u = 0; u < numeroDeVertices; u++) {
 				listaAdj[u] = new ArrayList<Aresta>();
+				listaAdjInt[u] = new ArrayList<Integer>();
+			}
+			
+				
 			
 		} else {
 			throw new IllegalArgumentException("O númeo de Vértices deve ser positivo!");
@@ -101,9 +109,38 @@ public class Grafo {
 
 		listaAdj[u].add(aresta);	// Adiciona uma aresta de u para v
 		listaAdj[v].add(aresta); 	// Adiciona outra resta de v para u
-		numeroDeArestas++;			// Incrementa o número de arestasv	
+		numeroDeArestas++;			// Incrementa o número de arestasv
+		arestas.add(aresta);
+		AdicionaAresta(u, v);
 
 	} // Fim do método AdicionaAresta
+	
+	
+	
+	/**
+	 * Adiciona uma aresta não direcionada de u → v  no Grafo
+	 * @param u Vértice origem da aresta
+	 * @param v Vértice destino da aresta
+	 * @throws java.lang.IndexOutOfBoundsException ao menos que ambos 0 <= u < V E 0 <= v < V
+	 */
+	public void AdicionaAresta(int u, int v) {
+		
+		if (u < 0 || u >= numeroDeVertices)
+			throw new IndexOutOfBoundsException();
+		else if (v < 0 || v >= numeroDeVertices)
+			throw new IndexOutOfBoundsException();
+		else {
+			
+			if (!listaAdjInt[u].contains(v)) {
+				numeroDeArestas++;		// Incrementa o número de arestas
+				listaAdjInt[u].add(v);	// Adiciona uma aresta de u para v
+				listaAdjInt[v].add(u); 	// Adiciona outra resta de v para u
+			}
+
+		} // Fim de if/else
+		
+	} // Fim do método AdicionaAresta
+
 
 
 	/**
@@ -133,6 +170,10 @@ public class Grafo {
 	
 	public Iterable<Aresta> Adjacencias(int u) {
 		return listaAdj[u];
+	}
+	
+	public Iterable<Integer> AdjacenciasInt(int u) {
+		return listaAdjInt[u];
 	}
 	
 	/**
@@ -170,42 +211,77 @@ public class Grafo {
 	} // Fim do método VizinhosAdjacentes
 	
 	
-	public String ImprimeListaAdj() {
+	/**
+	 * Obtém os rótulos relacionados a cada uma dos vértices do grafo
+	 * @return Os rótulos dos vértices do grafo
+	 */
+	public String[] ObtemRotulosVertices() {
 		
-		StringBuilder stringBuilder = new StringBuilder();
 		ArrayList<String> palavras = new ArrayList<String>();
-		
-		for (int u = 0; u < listaAdj.length; u++) {
-			
-			for (Aresta aresta : listaAdj[u]) {
 
-				if (!palavras.contains(aresta.getRotuloVerticeInicial()))
-					palavras.add(aresta.getRotuloVerticeInicial());
-				else if (!palavras.contains(aresta.getRotuloVerticeFinal()))
-					palavras.add(aresta.getRotuloVerticeFinal());
-			}
-		}
-		
-		
-		
 		for (int u = 0; u < listaAdj.length; u++) {
 			
-			String palavra = palavras.get(u);
-			stringBuilder.append("[" + u + "] " + palavra + " -> ");
-			
-			
- 			
-			for (Aresta aresta : Arestas()) {
-				
-				if (aresta.getRotuloVerticeInicial().equals(palavra))
-					stringBuilder.append(aresta.getRotuloVerticeFinal() + "  ");
-				else
-					stringBuilder.append(aresta.getRotuloVerticeInicial() + "  ");
+			for (Aresta aresta : arestas) {
+
+				if (aresta.getU() == u && !palavras.contains(aresta.getRotuloVerticeInicial()))
+					palavras.add(aresta.getRotuloVerticeInicial());
+				else if (aresta.getV() == u && !palavras.contains(aresta.getRotuloVerticeFinal()))
+					palavras.add(aresta.getRotuloVerticeFinal());
 					
-			}
+			} // Fim foreach
+			
+		} // Fim for int u = 0
+		
+		return palavras.toArray(new String[palavras.size()]);
+		
+	} // Fim do método ObtemResultadosVertices
+	
+	
+	/**
+	 * Obtém uma string que representa a lista de adjacências do grafo
+	 * @return String que representa a lista de adjacências do grafo
+	 */
+	public String ListaAdjString() {
+		
+		String[] rotulosArestas = ObtemRotulosVertices();
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("\n");
+		
+		for (int u = 0; u < numeroDeVertices; u++) {
+			
+			stringBuilder.append(rotulosArestas[u] + "  ");
+			
+			for (int v : listaAdjInt[u])
+				stringBuilder.append(rotulosArestas[v] + " ");
 			
 			stringBuilder.append("\n");
-		}
+			
+		} // Fim for int u = 0
+		
+		stringBuilder.append("\n");
+		
+		return stringBuilder.toString();
+		
+	} // Fim do método ListaAdjString
+	
+	
+	public String ListaAdjInt() {
+		
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("\n");
+		
+		for (int u = 0; u < numeroDeVertices; u++) {
+			
+			stringBuilder.append(u + "  ");
+			
+			for (int v : listaAdjInt[u])
+				stringBuilder.append(v + " ");
+			
+			stringBuilder.append("\n");
+			
+		} // Fim for int u = 0
+		
+		stringBuilder.append("\n");
 		
 		return stringBuilder.toString();
 	}
