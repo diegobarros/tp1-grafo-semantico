@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import grafos.Grafo;
 import grafos.algoritmos.*;
@@ -17,6 +18,9 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	private String[] palavrasDestino;
 	
 	private Grafo grafoDePalavras;
+	private ArrayList<String> rotulosVertices;
+	BuscaEmLargura buscaEmLargura;
+	
 
 	private int numeroDeClusters;
 	
@@ -55,6 +59,10 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 		this.numeroDeClusters = numeroDeClusters;
 		
 		similaridades = new ArrayList<Double>(palavrasOrigem.length);
+		
+		String[] rotulos = grafoDePalavras.ObtemRotulosVertices();
+		rotulosVertices = new ArrayList<String>(Arrays.asList(rotulos));
+		
 		CalculaSimilaridades();
 		
 	} // Fim do contrutor
@@ -110,23 +118,79 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 		return grafoDePalavras;
 	}
 	
-	
-	
-	
-	
+	/**
+	 * @return the similaridades
+	 */
+	public Double[] getSimilaridades() {
+		return similaridades.toArray(new Double[similaridades.size()]);
+	}
+
+	/**
+	 * @param similaridades the similaridades to set
+	 */
+	public void setSimilaridades(ArrayList<Double> similaridades) {
+		this.similaridades = similaridades;
+	}
+
 	/**
 	 * Mede a similaridade entre os pares de palavras fornecidas como parametro
 	 */
 	private void CalculaSimilaridades() {
 		
+		System.out.println("\n.:: Menor Caminho - Busca em Largura ::.\n");
+		
 		for (int i = 0; i < palavrasOrigem.length; i++) {
 			
-			similaridades.add(Sim(palavrasOrigem[i], palavrasDestino[i]));
+			double similaridade = Sim(palavrasOrigem[i], palavrasDestino[i]);
 			
-			
+			if (Double.isInfinite(similaridade))
+				similaridades.add(0.0);
+			else
+				similaridades.add(similaridade);
+	
 		} // Fim de for int i = 0
 		
 	} // Fim do método CalculaSimilaridades
+
+	
+	
+	/**
+	 * Obtém valores únicos dos vértices para serem utilizados como fontes
+	 * @param vertices Vetor de vértices
+	 * @return Um vetor contendo os valores únicos para os vértices
+	 */
+	private Iterable<Integer> ObtemVerticesFonte(Integer[] vertices) {
+		
+		ArrayList<Integer> verticesFonte = new ArrayList<Integer>();
+		
+		for (int i = 0; i < vertices.length; i++) {
+			
+			if (!verticesFonte.contains(vertices[i]))
+				verticesFonte.add(vertices[i]);
+		}
+		
+		return verticesFonte;
+		
+	} // Fim do Método ObtemVerticesFonte
+	
+	
+	
+	/**
+	 * Obtém o respectivo índice do rótulo do vértice no grafo
+	 * @param rotulo Um string representando o rótulo do grafo
+	 * @return O respectivo índice do rótulo do vértice no grafo caso contrário -1
+	 */
+	private int IndiceDoRotulo(String rotulo) {
+		
+		int indice = -1;
+		
+		for (int i = 0; i < rotulosVertices.size(); i++)
+			if (rotulosVertices.get(i).equalsIgnoreCase(rotulo))
+				indice = i;
+		
+		return indice;
+		
+	} // Fim do método IndiceDoRotulo
 	
 	
 
@@ -144,74 +208,34 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	@Override
 	public double Len(String w1, String w2) {
 		
+		int verticeOrigem = IndiceDoRotulo(w1);
+		int verticeDestino = IndiceDoRotulo(w2);
+		int tamanhoMenorCaminho = 0;
 		
-		Integer[] verticesOrigem = grafoDePalavras.ObtemVerticesInteiros(palavrasOrigem);
+		buscaEmLargura = new BuscaEmLargura(grafoDePalavras, verticeOrigem);
 		
-		int fonte = 0;
-		BuscaEmLargura buscaEmLargura = new BuscaEmLargura(grafoDePalavras, fonte);
-		
-		
-		
-		for (int u = 0; u <	 grafoDePalavras.getNumeroDeVertices(); u++) {
+		if (buscaEmLargura.ExisteCaminhoPara(verticeDestino)) {
 			
-			if (buscaEmLargura.ExisteCaminhoPara(u)) {
-				
-				System.out.print(String.format("%d para %d (%d):  ", fonte, u, buscaEmLargura.DistanciaPara(u)));
-				
-				for (int  v : buscaEmLargura.CaminhoPara(u)) {
-					if (v == fonte)
-						System.out.print(v);
-					else
-						System.out.print("-" + v);
-				}
-				
-				System.out.println();
-				
-			} else {
-				System.out.println(String.format("%d para %d (-):  Não conectado\n", fonte, u));
+			
+			tamanhoMenorCaminho = buscaEmLargura.DistanciaPara(verticeDestino);
+			System.out.print(String.format("[%d] %s PARA [%d] %s (%d):  ", verticeOrigem, w1, verticeDestino, w2, tamanhoMenorCaminho));
+			
+			
+			for (int  v : buscaEmLargura.CaminhoPara(verticeDestino)) {
+				if (v == verticeOrigem)
+					System.out.print(v);
+				else
+					System.out.print(v + " - ");
 			}
-		}
+			
+			System.out.println();
+			
+		} else {
+				System.out.println(String.format("\n[%d] %s Para [%d] %s (-):  Não conectado\n", verticeOrigem, w1, verticeDestino, w2));
+			}
 		
-		
-		
-		
-		
-		
-		
-		return 0;
+		return tamanhoMenorCaminho;
 		
 	} // Fim do método Len
 
 } // Fim da Classe SimilaridadeSemantica
-
-
-
-
-//System.out.println(grafo.ImprimeListaAdj());
-		//ArrayList<Integer> nosFontes = new ArrayList<Integer>();
-		//for (int i = 0; i < grafo.getNumeroDeVertices(); i++)
-			//nosFontes.add(i);
-		
-		
-		/*
-		BuscaEmLargura buscaEmLargura = new BuscaEmLargura(grafo, nosFontes);
-		
-		for (int u = 0; u <	 grafo.getNumeroDeVertices(); u++) {
-			
-			if (buscaEmLargura.ExisteCaminhoPara(u)) {
-				
-				System.out.print(String.format("%d para %d (%d):  ", nosFontes.get(u), u, buscaEmLargura.DistanciaPara(u)));
-				
-				for (int  v : buscaEmLargura.CaminhoPara(u)) {
-					if (v == nosFontes.get(u))
-						System.out.print(v);
-					else
-						System.out.print("-" + v);
-				}
-				
-				System.out.println();
-				
-			} else {
-				System.out.println(String.format("%d para %d (-):  Não conectado\n", nosFontes.get(u), u));
-			}
-		}*/

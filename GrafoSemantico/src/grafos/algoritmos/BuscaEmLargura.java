@@ -117,7 +117,7 @@ public class BuscaEmLargura {
 	
 		for (int noFonte : nosFontes) {
 		
-			marcado[noFonte] = false;
+			marcado[noFonte] = true;
 			distanciaPara[noFonte] = 0;
 			lista.add(noFonte);
 		
@@ -127,14 +127,14 @@ public class BuscaEmLargura {
 		
 			int u = lista.removeFirst();
 		
-			for (Aresta aresta : grafo.Adjacencias(u)) {
+			for (int v : grafo.AdjacenciasInt(u)) {
 			
-				if(aresta.getU() == u && !marcado[aresta.getV()]) {
+				if(!marcado[v]) {
 				
-					arestaPara[aresta.getV()] = u;
-					distanciaPara[aresta.getV()] = distanciaPara[u] + 1;
-					marcado[aresta.getV()] = true;
-					lista.add(aresta.getV());
+					arestaPara[v] = u;
+					distanciaPara[v] = distanciaPara[u] + 1;
+					marcado[v] = true;
+					lista.add(v);
 				
 				} // Fim de if
 			

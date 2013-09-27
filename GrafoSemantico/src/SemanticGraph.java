@@ -15,6 +15,8 @@ import grafos.*;
  */
 public class SemanticGraph {
 	
+	static SimilaridadeSemantica similaridadeSemantica;
+	
 	// Dicionário e Mineração Textual
 	static ArrayList<String> palavrasDicionario;
 	static ArrayList<String> definicoesDicionario;
@@ -36,7 +38,7 @@ public class SemanticGraph {
 	static File arquivoDicionario;
 	static File arquivoParesPalavras;
 	
-	static File arquivoSaida;
+	static File arquivoSimilaridades;
 	
 	
 	static void Inicializa(String[] parametros) {
@@ -54,6 +56,7 @@ public class SemanticGraph {
 		
 		arquivoDicionario = new File(parametros[0]);
 		arquivoParesPalavras = new File(parametros[1]);
+		arquivoSimilaridades = new File(parametros[2]);
 		
 		numeroClusters = Integer.parseInt(parametros[4]);
 		
@@ -231,10 +234,23 @@ public class SemanticGraph {
 	 */
 	static void MedeSimilaridadeSemantica() {
 		
+		StringBuilder stringBuilder = new StringBuilder();
+		
 		String[] palavras1 = palavrasOrigem.toArray(new String[palavrasOrigem.size()]);
 		String[] palavras2 = palavrasDestino.toArray(new String[palavrasDestino.size()]);
 		
-		SimilaridadeSemantica similaridadeSemantica = new SimilaridadeSemantica(palavras1, palavras2, grafo, numeroClusters);
+		similaridadeSemantica = new SimilaridadeSemantica(palavras1, palavras2, grafo, numeroClusters);
+		
+		
+		System.out.println("\n\n.:: Similaridades Semântica ::.\n");
+		Double[] similaridades = similaridadeSemantica.getSimilaridades();
+		
+		for (Double similaridade : similaridades) {
+			stringBuilder.append(String.format(Locale.ENGLISH, "%.1f \n", similaridade));
+			System.out.println(similaridade);
+		}
+		
+		SalvarArquivo(arquivoSimilaridades, stringBuilder.toString());
 		
 	} // Fim do método CalculaSimilaridadeSemantica
 	
