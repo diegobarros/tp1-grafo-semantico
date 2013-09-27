@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import grafos.Aresta;
 import grafos.Grafo;
 import grafos.algoritmos.*;
 
@@ -21,6 +22,8 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	private ArrayList<String> rotulosVertices;
 	BuscaEmLargura buscaEmLargura;
 	
+	private Grafo grafoPonderado;
+	
 
 	private int numeroDeClusters;
 	
@@ -40,6 +43,12 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 		this.palavra2 = palavra2;
 		this.grafoDePalavras = grafoDePalavras;
 		this.numeroDeClusters = numeroDeClusters;
+		
+		String[] rotulos = grafoDePalavras.ObtemRotulosVertices();
+		rotulosVertices = new ArrayList<String>(Arrays.asList(rotulos));
+		
+		CalculaSimilaridades();
+		CriaGrupoPalavrasSemelhantes();
 	}
 	
 	
@@ -64,6 +73,7 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 		rotulosVertices = new ArrayList<String>(Arrays.asList(rotulos));
 		
 		CalculaSimilaridades();
+		CriaGrupoPalavrasSemelhantes();
 		
 	} // Fim do contrutor
 
@@ -151,8 +161,52 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 		} // Fim de for int i = 0
 		
 	} // Fim do método CalculaSimilaridades
-
 	
+
+	/**
+	 * A partir da árvore geradora mínima do grafo de palavras
+	 * cria grupos de palavras
+	 */
+	private void CriaGrupoPalavrasSemelhantes() {
+		
+		ConstroiGrafoPonderado();
+		
+	} // Fim do método CriaGrupoPalavrasSemelhantes
+	
+	/**
+	 * Dado os pesos do cálculo de similaridade semântica</br>
+	 * constrói um grafo ponderado a partir deles
+	 */
+	private void ConstroiGrafoPonderado() {
+		
+		ArrayList<Aresta> arestas = new ArrayList<Aresta>();
+		
+		
+		grafoPonderado = new Grafo(grafoDePalavras.getNumeroDeVertices());
+		
+		System.out.println("\n.:: Criando Arestas Ponderada ::.\n");
+		
+		for (int i = 0; i < palavrasOrigem.length; i++) {
+
+			int verticeOrigem = IndiceDoRotulo(palavrasOrigem[i]);
+			int verticeDestino = IndiceDoRotulo(palavrasDestino[i]);
+			double peso = similaridades.get(i);
+			Aresta aresta = new Aresta(verticeOrigem, verticeDestino, peso, palavrasOrigem[i], palavrasDestino[i]);
+			arestas.add(aresta);
+			grafoPonderado.AdicionaAresta(aresta);
+			
+			System.out.println(aresta.toString());
+			
+		} // Fim for int i = 0
+		
+		
+		
+		
+		System.out.println("\n.:: Grafo ponderado ::.\n");
+		System.out.println(grafoPonderado.ListaAdjString());
+		
+		
+	} // Fim do método ConstroiGrafoPonderado
 	
 	/**
 	 * Obtém valores únicos dos vértices para serem utilizados como fontes

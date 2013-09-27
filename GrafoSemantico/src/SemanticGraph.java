@@ -255,6 +255,11 @@ public class SemanticGraph {
 	} // Fim do método CalculaSimilaridadeSemantica
 	
 	
+	static void ObtemGruposDePalavras() {
+		
+	} // Fim do método ObtemGruposDePalavras
+	
+	
 	/**
 	 * @param arquivo Arquivo de entrada
 	 * @return Uma string com o conteúdo do arquivo
