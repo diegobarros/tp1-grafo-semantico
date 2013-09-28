@@ -50,9 +50,8 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 		CalculaSimilaridades();
 		CriaGrupoPalavrasSemelhantes();
 	}
-	
-	
 
+	
 	/**
 	 * @param palavrasOrigem
 	 * @param palavrasDestino
@@ -171,6 +170,16 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 		
 		ConstroiGrafoPonderado();
 		
+		Prim prim = new Prim(grafoPonderado);
+		
+		System.out.println("\n.:: Árvore Geradora Mínima - PRIM ::.\n");
+		
+		for (Aresta aresta : prim.ArestasArvoreGeradoraMin())
+			System.out.println(aresta);
+		
+		
+		System.out.println(String.format("%.5f\n", prim.PesoArvoreGeradoraMin()));
+		
 	} // Fim do método CriaGrupoPalavrasSemelhantes
 	
 	/**
@@ -180,7 +189,6 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	private void ConstroiGrafoPonderado() {
 		
 		ArrayList<Aresta> arestas = new ArrayList<Aresta>();
-		
 		
 		grafoPonderado = new Grafo(grafoDePalavras.getNumeroDeVertices());
 		
@@ -199,14 +207,12 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 			
 		} // Fim for int i = 0
 		
-		
-		
-		
 		System.out.println("\n.:: Grafo ponderado ::.\n");
 		System.out.println(grafoPonderado.ListaAdjString());
 		
-		
 	} // Fim do método ConstroiGrafoPonderado
+	
+	
 	
 	/**
 	 * Obtém valores únicos dos vértices para serem utilizados como fontes
@@ -255,6 +261,8 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	public double Sim(String w1, String w2) {
 		return (1 / Len(w1, w2));
 	}
+	
+	
 
 	/* (non-Javadoc)
 	 * @see SimilaridadeSemanticaPalavras#Len(java.lang.String, java.lang.String)
