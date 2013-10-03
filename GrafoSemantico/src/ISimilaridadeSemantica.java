@@ -3,7 +3,7 @@
  *  com medida baseada em aresta [Jiang and Conrath 1997]
  * @author Diego Augusto de Faria Barros
  */
-public interface SimilaridadeSemanticaPalavras {
+public interface ISimilaridadeSemantica {
 	
 	/**
 	 * Mede a similaridade semântica entre as palavras

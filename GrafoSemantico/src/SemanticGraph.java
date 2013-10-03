@@ -37,8 +37,8 @@ public class SemanticGraph {
 	// Entrada/Saída dos Dados
 	static File arquivoDicionario;
 	static File arquivoParesPalavras;
-	
 	static File arquivoSimilaridades;
+	static File arquivoGrupoPalavras;
 	
 	
 	static void Inicializa(String[] parametros) {
@@ -57,6 +57,7 @@ public class SemanticGraph {
 		arquivoDicionario = new File(parametros[0]);
 		arquivoParesPalavras = new File(parametros[1]);
 		arquivoSimilaridades = new File(parametros[2]);
+		arquivoGrupoPalavras = new File(parametros[3]);
 		
 		numeroClusters = Integer.parseInt(parametros[4]);
 		
@@ -252,14 +253,34 @@ public class SemanticGraph {
 		
 		SalvarArquivo(arquivoSimilaridades, stringBuilder.toString());
 		
-		ObtemGruposDePalavras();
+		
 		
 	} // Fim do método CalculaSimilaridadeSemantica
 	
 	
 	static void ObtemGruposDePalavras() {
 		
-		similaridadeSemantica.CriaGrupoPalavrasSemelhantes();
+		similaridadeSemantica.CriaGrupoPalavrasSemelhantes();		
+		ArrayList<String>[] grupoPalavras = similaridadeSemantica.getGrupoDePalavras();
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		
+		for (int i = 0; i < grupoPalavras.length; i++) {
+			
+			
+			for (String palavra : grupoPalavras[i])
+				stringBuilder.append(palavra + ", ");
+			
+
+			stringBuilder.deleteCharAt(stringBuilder.lastIndexOf(", "));
+			stringBuilder.append("\n"); 
+			
+		} // Fm for int i
+		
+		
+		String grupoDePalavras = stringBuilder.toString();
+		System.out.println(grupoDePalavras);
+		SalvarArquivo(arquivoGrupoPalavras, grupoDePalavras);
 		
 	} // Fim do método ObtemGruposDePalavras
 	
@@ -356,6 +377,7 @@ public class SemanticGraph {
 		
 		ConstroiGrafo();
 		MedeSimilaridadeSemantica();
+		ObtemGruposDePalavras();
 		
 	} // Fim do método Main
 
@@ -377,6 +399,6 @@ public class SemanticGraph {
  * 	      Nome: Diego Augusto de Faria Barros                           *
  *   																	*
  *                                                                      *
- *              Belo Horizonte, 02 de Outubro de 2013	  	            *
+ *              Belo Horizonte, 07 de Outubro de 2013	  	            *
  ************************************************************************
 */

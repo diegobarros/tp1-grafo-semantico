@@ -27,6 +27,7 @@ public class Grafo {
 	 * @param numeroDeVertices Número Total de Vértices do Grafo
 	 * @throws java.lang.IllegalArgumentException SE V < 0
 	 */
+	@SuppressWarnings("unchecked")
 	public Grafo(int numeroDeVertices) {
 		
 		if (numeroDeVertices >= 0) {

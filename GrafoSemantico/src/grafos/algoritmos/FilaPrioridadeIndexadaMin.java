@@ -44,6 +44,7 @@ public class FilaPrioridadeIndexadaMin<Key extends Comparable<Key>> implements I
 	 * @param numeroElementosMax As chaves na fila de prioridade estão indexadas de 0 até numeroElementosMax - 1
      * @throws java.lang.IllegalArgumentException se numeroElementosMax < 0
 	 */
+	@SuppressWarnings("unchecked")
 	public FilaPrioridadeIndexadaMin(int numeroElementosMax) {
 		
 		if (numeroElementosMax < 0)

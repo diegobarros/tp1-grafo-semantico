@@ -11,9 +11,7 @@ import grafos.Aresta;
  */
 public class QuickSortArestas {
 
-	public QuickSortArestas() {
-		// TODO Auto-generated constructor stub
-	}
+	public QuickSortArestas() {	}
 	
 	
 	/**
@@ -115,6 +113,7 @@ public class QuickSortArestas {
 		arestas[j] = memoriaTroca;
 	}
 	
+	@SuppressWarnings("unused")
 	private static boolean EstaOrdenado(Aresta[] arestas) {
 		return EstaOrdenado(arestas, 0, arestas.length - 1);
 	}

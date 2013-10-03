@@ -9,7 +9,7 @@ public class BuscaEmProfundidade {
 	private boolean[] marcado; 		// marcado[u] = existe um caminho s - u
 	private int[] arestaPara;		// arestaPara[u] = última aresta no caminho s-u
 	private int noFonte;			// Vértice fonte	
-	private int contador;			// Número de vértices conectados a fonte
+	private int contador;			// Número de vértices conectados à fonte
 	
 
 	/**
@@ -26,6 +26,12 @@ public class BuscaEmProfundidade {
 		
 	} // fim do construtor
 	
+	
+	/**
+	 * Número de vértices conectados à fonte
+	 * @return Número de vértices conectados à fonte
+	 */
+	public int getContador() {	return contador;  }
 	
 	
 	/**
@@ -87,7 +93,5 @@ public class BuscaEmProfundidade {
 		
 		
 	} // Fim do método CaminhoPara
-	
-	
 
 } // Fim da classe BuscaEmProfundidade

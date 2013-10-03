@@ -11,7 +11,7 @@ import grafos.algoritmos.*;
  * @author Diego Augusto de Faria Barros
  *
  */
-public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
+public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 	
 	private String palavra1;
 	private String palavra2;
@@ -27,7 +27,6 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	BuscaEmLargura buscaEmLargura;
 	
 	private ArrayList<Double> similaridades;
-	private final static double SIMILARIDADE_MIN = 0.5d;
 	
 	private ArrayList<String>[] grupoDePalavras;
 	private int numeroDeClusters;
@@ -38,6 +37,7 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	 * @param grafoDePalavras
 	 * @param numeroDeClusters
 	 */
+	@SuppressWarnings("unchecked")
 	public SimilaridadeSemantica(String palavra1, String palavra2,
 			Grafo grafoDePalavras, int numeroDeClusters) {
 		
@@ -62,6 +62,7 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	 * @param grafoDePalavras
 	 * @param numeroDeClusters
 	 */
+	@SuppressWarnings("unchecked")
 	public SimilaridadeSemantica(String[] palavrasOrigem,
 			String[] palavrasDestino, Grafo grafoDePalavras,
 			int numeroDeClusters) {
@@ -145,6 +146,16 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	public void setSimilaridades(ArrayList<Double> similaridades) {
 		this.similaridades = similaridades;
 	}
+	
+	
+
+	/**
+	 * @return the grupoDePalavras
+	 */
+	public ArrayList<String>[] getGrupoDePalavras() {
+		return grupoDePalavras;
+	}
+
 
 	/**
 	 * Mede a similaridade entre os pares de palavras fornecidas como parametro
@@ -186,9 +197,7 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	 * Remove as k - 1 Arestas de peso mínimo do Grafo
 	 */
 	private void RemoveArestas() {
-		
-		ArrayList<Aresta> arestasGrafoClusters = new ArrayList<Aresta>();
-		
+
 		LinkedList<Aresta> arestasPesoMinimo = new LinkedList<Aresta>();
 		ArrayList<Aresta> arestasAGM = (ArrayList<Aresta>) grafoDePalavrasAGM.Arestas();
 		Aresta[] arestasGrafoAGM = new Aresta[arestasAGM.size()];
@@ -235,7 +244,6 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 			
 		} while (arestasPesoMinimo.size() > 0);
 		
-		
 		System.out.println("\n\nArestas Mínimas");
 		System.out.println(grafoDePalavrasAGM.ListaAdjInt());
 		
@@ -243,6 +251,10 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	
 	
 	
+	/**
+	 * Cria os grupos de palavras similares a partir do número de clusteres (k)
+	 * passado como parâmetro
+	 */
 	private void GeraGruposDePalavras() {
 		
 		String[] rotulos = grafoDePalavrasAGM.ObtemRotulosVertices();
@@ -252,6 +264,7 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 		int totalComponentes = componentesConectados.NumeroComponentesConectados();
 		System.out.println("\nNúmero de Componentes: " + totalComponentes);
 		
+		@SuppressWarnings("unchecked")
 		LinkedList<Integer>[] listaComponentes = (LinkedList<Integer>[])new LinkedList[totalComponentes];
 		
 		for (int i = 0; i < totalComponentes; i++)
@@ -263,16 +276,39 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 		
 		for (int u = 0; u < totalComponentes; u++) {
 			
-			for (int v : listaComponentes[u]) {
+			for (int v : listaComponentes[u])
 				grupoDePalavras[u].add(rotulos[v]);
-				System.out.print(v + "  ");
-				System.out.print(rotulos[v] + "  ");
-			}
-			
-			System.out.println();
-		}
+
+		} // Fim for int u = 0
+		
+		OrdenaGrupoPalavras();
 		
 	} // Fim do método GeraGrupoDePalavras
+	
+	
+	/**
+	 * Ordenas as palavras pertencente a cada grupo em ordem crescente (alfabética)
+	 */
+	private void OrdenaGrupoPalavras() {
+		
+		for (int k = 0; k < grupoDePalavras.length; k++) {
+			
+			
+			int numeroPalavras = grupoDePalavras[k].size();
+			ArrayList<String> palavrasOrdenadas = new ArrayList<String>(numeroPalavras);
+			
+			String[] palavras = grupoDePalavras[k].toArray(new String[numeroPalavras]);
+			QuickSort.Ordena(palavras);
+			
+			
+			for (int i = 0; i < palavras.length; i++)
+				palavrasOrdenadas.add(palavras[i]);
+			
+			grupoDePalavras[k] = palavrasOrdenadas;
+			
+		} // Fim for int k = 0
+		
+	} // Fim do método OrdenaGrupoPalavras
 	
 
 	/**
@@ -335,6 +371,7 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	 * @param vertices Vetor de vértices
 	 * @return Um vetor contendo os valores únicos para os vértices
 	 */
+	@SuppressWarnings("unused")
 	private Iterable<Integer> ObtemVerticesFonte(Integer[] vertices) {
 		
 		ArrayList<Integer> verticesFonte = new ArrayList<Integer>();
@@ -371,7 +408,7 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	
 
 	/* (non-Javadoc)
-	 * @see SimilaridadeSemanticaPalavras#Sim(java.lang.String, java.lang.String)
+	 * @see ISimilaridadeSemantica#Sim(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public double Sim(String w1, String w2) {
@@ -381,7 +418,7 @@ public class SimilaridadeSemantica implements SimilaridadeSemanticaPalavras {
 	
 
 	/* (non-Javadoc)
-	 * @see SimilaridadeSemanticaPalavras#Len(java.lang.String, java.lang.String)
+	 * @see ISimilaridadeSemantica#Len(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public double Len(String w1, String w2) {
