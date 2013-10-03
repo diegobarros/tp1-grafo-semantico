@@ -240,7 +240,7 @@ public class SemanticGraph {
 		String[] palavras2 = palavrasDestino.toArray(new String[palavrasDestino.size()]);
 		
 		similaridadeSemantica = new SimilaridadeSemantica(palavras1, palavras2, grafo, numeroClusters);
-		
+		similaridadeSemantica.CalculaSimilaridades();
 		
 		System.out.println("\n\n.:: Similaridades Semântica ::.\n");
 		Double[] similaridades = similaridadeSemantica.getSimilaridades();
@@ -252,10 +252,14 @@ public class SemanticGraph {
 		
 		SalvarArquivo(arquivoSimilaridades, stringBuilder.toString());
 		
+		ObtemGruposDePalavras();
+		
 	} // Fim do método CalculaSimilaridadeSemantica
 	
 	
 	static void ObtemGruposDePalavras() {
+		
+		similaridadeSemantica.CriaGrupoPalavrasSemelhantes();
 		
 	} // Fim do método ObtemGruposDePalavras
 	

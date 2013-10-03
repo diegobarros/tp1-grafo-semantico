@@ -116,6 +116,61 @@ public class Grafo {
 	} // Fim do método AdicionaAresta
 	
 	
+	public void RemoveAresta(Aresta aresta) {
+		
+		
+		int u = aresta.NoFonte();
+		int v = aresta.OutroVertice(u);
+		/*
+		
+		
+		if (listaAdj[u].contains(aresta) && arestas.contains(aresta)) {
+		
+			int indiceU = listaAdj[u].indexOf(aresta);
+			int indiceV = listaAdj[v].indexOf(aresta);
+			int indiceAresta = arestas.indexOf(aresta);
+			
+			listaAdj[u].remove(indiceU);	// Adiciona uma aresta de u para v
+			listaAdj[v].remove(indiceV); 	// Adiciona outra resta de v para u
+			arestas.remove(indiceAresta);
+		}*/
+		
+		RemoveAresta(u, v);
+		numeroDeArestas--;				// Incrementa o número de arestasv
+		
+	} // Fim do método RemoveAresta
+	
+	
+	/**
+	 * Adiciona uma aresta não direcionada de u → v  no Grafo
+	 * @param u Vértice origem da aresta
+	 * @param v Vértice destino da aresta
+	 * @throws java.lang.IndexOutOfBoundsException ao menos que ambos 0 <= u < V E 0 <= v < V
+	 */
+	public void RemoveAresta(int u, int v) {
+		
+		if (u < 0 || u >= numeroDeVertices)
+			throw new IndexOutOfBoundsException();
+		else if (v < 0 || v >= numeroDeVertices)
+			throw new IndexOutOfBoundsException();
+		else {
+			
+			if (listaAdjInt[u].contains(v)) {
+				
+				int indice = listaAdjInt[u].indexOf(v);
+				int outroIndice = listaAdjInt[v].indexOf(u);
+				
+				listaAdjInt[u].remove(indice);		// Adiciona uma aresta de u para v
+				listaAdjInt[v].remove(outroIndice);	// Adiciona uma aresta de u para v
+			}
+			
+		} // Fim de if/else
+		
+	} // Fim do método AdicionaAresta
+
+	
+	
+	
 	
 	/**
 	 * Adiciona uma aresta não direcionada de u → v  no Grafo
@@ -132,7 +187,7 @@ public class Grafo {
 		else {
 			
 			if (!listaAdjInt[u].contains(v)) {
-				numeroDeArestas++;		// Incrementa o número de arestas
+
 				listaAdjInt[u].add(v);	// Adiciona uma aresta de u para v
 				listaAdjInt[v].add(u); 	// Adiciona outra resta de v para u
 			}
@@ -177,7 +232,7 @@ public class Grafo {
 	}
 	
 	/**
-	 * Obtém a lista dos vizinhos do vértice u com um Iterable
+	 * Obtém a lista dos vizinhos do vértice u como um Iterable
 	 * @param u Um dos vértices da aresta do grafo
 	 * @return a lista dos vizinhos do vértice u com um Iterable
 	 * @throws java.lang.IndexOutOfBoundsException ao menos que 0 <= u < |V|

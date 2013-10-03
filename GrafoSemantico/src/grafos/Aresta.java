@@ -172,7 +172,11 @@ public class Aresta implements Comparable<Aresta> {
 		stringBuilder.append(" <");
 		stringBuilder.append(getU());
 		stringBuilder.append(", ");
+		stringBuilder.append(getRotuloVerticeInicial());
+		stringBuilder.append(", ");
 		stringBuilder.append(getV());
+		stringBuilder.append(", ");
+		stringBuilder.append(getRotuloVerticeFinal());
 		stringBuilder.append(", ");
 		stringBuilder.append(getPeso());
 		stringBuilder.append("> ");
