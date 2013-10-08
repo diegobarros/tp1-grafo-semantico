@@ -1,5 +1,7 @@
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.LinkedList;
 
 import grafos.Aresta;
@@ -31,13 +33,15 @@ public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 	private ArrayList<String>[] grupoDePalavras;
 	private int numeroDeClusters;
 	
+	static Calendar calendario = Calendar.getInstance();
+	static SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+	
 	/**
 	 * @param palavra1
 	 * @param palavra2
 	 * @param grafoDePalavras
 	 * @param numeroDeClusters
 	 */
-	@SuppressWarnings("unchecked")
 	public SimilaridadeSemantica(String palavra1, String palavra2,
 			Grafo grafoDePalavras, int numeroDeClusters) {
 		
@@ -48,11 +52,7 @@ public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 		
 		String[] rotulos = grafoDePalavras.ObtemRotulosVertices();
 		rotulosVertices = new ArrayList<String>(Arrays.asList(rotulos));
-		
-		grupoDePalavras = ((ArrayList<String>[]) new ArrayList[numeroDeClusters]);
-		for (int i = 0; i < grupoDePalavras.length; i++)
-			grupoDePalavras[i] = new ArrayList<String>();
-		
+ 
 	}
 
 	
@@ -62,7 +62,6 @@ public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 	 * @param grafoDePalavras
 	 * @param numeroDeClusters
 	 */
-	@SuppressWarnings("unchecked")
 	public SimilaridadeSemantica(String[] palavrasOrigem,
 			String[] palavrasDestino, Grafo grafoDePalavras,
 			int numeroDeClusters) {
@@ -75,11 +74,7 @@ public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 		
 		String[] rotulos = grafoDePalavras.ObtemRotulosVertices();
 		rotulosVertices = new ArrayList<String>(Arrays.asList(rotulos));
-		
-		grupoDePalavras = ((ArrayList<String>[]) new ArrayList[numeroDeClusters]);
-		for (int i = 0; i < grupoDePalavras.length; i++)
-			grupoDePalavras[i] = new ArrayList<String>();
-		
+
 	} // Fim do contrutor
 
 
@@ -162,7 +157,7 @@ public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 	 */
 	public void CalculaSimilaridades() {
 		
-		System.out.println("\n.:: Menor Caminho - Busca em Largura ::.\n");
+		System.out.println("[" + sdf.format(calendario.getTime()) + "] " + "Executando o Algoritmo de Busca em Largura . . .\n\n");
 		
 		for (int i = 0; i < palavrasOrigem.length; i++) {
 			
@@ -208,18 +203,18 @@ public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 		// Ordena Arestas
 		QuickSortArestas.Ordena(arestasGrafoAGM);
 		
-		System.out.println("\n\n QUICK SORT lol\n");
-		for (int i = 0; i < arestasGrafoAGM.length; i++) {
+		System.out.println("[" + sdf.format(calendario.getTime()) + "] " + "Ordenando Arestas (Quick Sort) . . .\n\n");
+		
+		
+		for (int i = 0; i < arestasGrafoAGM.length; i++)
 			System.out.println(arestasGrafoAGM[i]);
-		}
 		
 		
 		// Obtém k Arestas de peso mínimo da AGM
 		for (int i = 0; i < numeroDeClusters - 1; i++)
 			arestasPesoMinimo.add(arestasGrafoAGM[i]);
 		
-		System.out.println("\n\ngrafo AGM");
-		System.out.println(grafoDePalavrasAGM.ListaAdjInt());
+		System.out.println("\n\n[" + sdf.format(calendario.getTime()) + "] " + "Removendo Arestas de Peso Mínimo");
 
 		
 		do {
@@ -244,9 +239,6 @@ public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 			
 		} while (arestasPesoMinimo.size() > 0);
 		
-		System.out.println("\n\nArestas Mínimas");
-		System.out.println(grafoDePalavrasAGM.ListaAdjInt());
-		
 	} // Fim do método RemoveAresta
 	
 	
@@ -255,6 +247,7 @@ public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 	 * Cria os grupos de palavras similares a partir do número de clusteres (k)
 	 * passado como parâmetro
 	 */
+	@SuppressWarnings("unchecked")
 	private void GeraGruposDePalavras() {
 		
 		String[] rotulos = grafoDePalavrasAGM.ObtemRotulosVertices();
@@ -262,9 +255,22 @@ public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 		ComponentesConectados componentesConectados = new ComponentesConectados(grafoDePalavrasAGM);
 		
 		int totalComponentes = componentesConectados.NumeroComponentesConectados();
-		System.out.println("\nNúmero de Componentes: " + totalComponentes);
+		System.out.println("\n[" + sdf.format(calendario.getTime()) + "] " + "Número de Componentes: " + totalComponentes);
+		System.out.println("\n");
 		
-		@SuppressWarnings("unchecked")
+		
+		grupoDePalavras = ((ArrayList<String>[]) new ArrayList[totalComponentes]);
+		for (int i = 0; i <  totalComponentes; i++)
+			grupoDePalavras[i] = new ArrayList<String>();
+		
+		
+		if(totalComponentes != numeroDeClusters) {
+			System.out.println("\n[" + sdf.format(calendario.getTime()) + "] " + 
+			"ATENÇÃO! O número de Componentes gerados é diferente do número número de clusters fornecido como parâmetro.\nPor favor, verique o grafo de entrada!\n\n");
+			System.out.println("Número de Clusters: " + numeroDeClusters);
+			System.out.println("  Clusters Gerados: " + totalComponentes + "\n\n");
+		}
+		
 		LinkedList<Integer>[] listaComponentes = (LinkedList<Integer>[])new LinkedList[totalComponentes];
 		
 		for (int i = 0; i < totalComponentes; i++)
@@ -274,7 +280,7 @@ public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 			listaComponentes[componentesConectados.IDComponenteConectado(u)].add(u);
 		 
 		
-		for (int u = 0; u < totalComponentes; u++) {
+		for (int u = 0; u < grupoDePalavras.length; u++) {
 			
 			for (int v : listaComponentes[u])
 				grupoDePalavras[u].add(rotulos[v]);
@@ -316,20 +322,18 @@ public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 	 */
 	private void CriaArvoreGeradoraMinima(){
 
+		System.out.println("[" + sdf.format(calendario.getTime()) + "] " + "Criando Árvore Geradora Mínima (Algoritmo de Prim) . . . ");
 		Prim prim = new Prim(grafoDePalavrasPonderado);
-		
-		System.out.println("\n.:: Árvore Geradora Mínima - PRIM ::.\n");
 		grafoDePalavrasAGM = new Grafo(grafoDePalavrasPonderado.getNumeroDeVertices());
 		
-		for (Aresta aresta : prim.ArestasArvoreGeradoraMin()) {
-			
-			grafoDePalavrasAGM.AdicionaAresta(aresta);
-			System.out.println(aresta);
-		}
 		
-		System.out.println(grafoDePalavrasAGM.ListaAdjString());
-		System.out.println(grafoDePalavrasAGM.ListaAdjInt());
-		System.out.println(String.format("%.5f\n", prim.PesoArvoreGeradoraMin()));
+		for (Aresta aresta : prim.ArestasArvoreGeradoraMin())
+			grafoDePalavrasAGM.AdicionaAresta(aresta);
+
+		
+		System.out.println("[" + sdf.format(calendario.getTime()) + "] " + "Árvore Geradora Mínima:\n");
+		System.out.println(grafoDePalavrasAGM.ListaAdjString());	
+		System.out.println(String.format("Peso Total: %.5f\n\n", prim.PesoArvoreGeradoraMin()));
 		
 	} // Fim do método CriaArvoreGeradoraMinima
 	
@@ -341,10 +345,9 @@ public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 	private void ConstroiGrafoPonderado() {
 		
 		ArrayList<Aresta> arestas = new ArrayList<Aresta>();
-		
 		grafoDePalavrasPonderado = new Grafo(grafoDePalavras.getNumeroDeVertices());
+		System.out.println("\n\n[" + sdf.format(calendario.getTime()) + "] " + "Criando Arestas Ponderadas\n");
 		
-		System.out.println("\n.:: Criando Arestas Ponderada ::.\n");
 		
 		for (int i = 0; i < palavrasOrigem.length; i++) {
 
@@ -359,7 +362,7 @@ public class SimilaridadeSemantica implements ISimilaridadeSemantica {
 			
 		} // Fim for int i = 0
 		
-		System.out.println("\n.:: Grafo ponderado ::.\n");
+		System.out.println("\n\n[" + sdf.format(calendario.getTime()) + "] " + "Grafo Ponderado:\n");
 		System.out.println(grafoDePalavrasPonderado.ListaAdjString());
 		
 	} // Fim do método ConstroiGrafoPonderado

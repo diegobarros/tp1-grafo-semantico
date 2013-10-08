@@ -1,11 +1,15 @@
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.es.SpanishAnalyzer;
+import org.apache.lucene.analysis.pt.PortugueseAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.Version;
+import org.apache.tika.language.*;
 
 import grafos.*;
 
@@ -22,6 +26,7 @@ public class SemanticGraph {
 	static ArrayList<String> definicoesDicionario;
 	static ArrayList<String> palavrasTokenizadasDicionario;
 	static ArrayList<ArrayList<String>> definicoesTokenizadasDicionario;
+	static LanguageIdentifier identficadorIdioma;
 	
 	// Grafos
 	static ArrayList<Aresta> arestasGrafo;
@@ -39,6 +44,9 @@ public class SemanticGraph {
 	static File arquivoParesPalavras;
 	static File arquivoSimilaridades;
 	static File arquivoGrupoPalavras;
+	
+	static Calendar calendario = Calendar.getInstance();
+	static SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 	
 	
 	static void Inicializa(String[] parametros) {
@@ -118,14 +126,20 @@ public class SemanticGraph {
 	 * @throws IOException 
 	 */
 	static void AnalisaDicionario(String[] palavras, String[] definicoes) throws IOException {
-
+		
+		
+		identficadorIdioma = new LanguageIdentifier(definicoes[0]);
+		String idiomaDefinicao = identficadorIdioma.getLanguage();
+		System.out.println("    Idioma: " + idiomaDefinicao + "\n\n");
+		
+		System.out.println("[" + sdf.format(calendario.getTime()) + "] " + "Fazendo Pré-Processamento Textual: \n");
 		
 		for (int i = 0; i < palavras.length; i++) {
-			
+
 			ArrayList<String> listaTokensDefinicoes = new ArrayList<String>();
-			
-			String[] tokensPalavras = AnalisaTexto(palavras[i]);
-			String[] tokensDefinicoes = AnalisaTexto(definicoes[i]);
+
+			String[] tokensPalavras = AnalisaTexto(palavras[i], idiomaDefinicao);
+			String[] tokensDefinicoes = AnalisaTexto(definicoes[i], idiomaDefinicao);
 			
 			for(String definicao : tokensDefinicoes)
 				listaTokensDefinicoes.add(definicao);
@@ -146,9 +160,9 @@ public class SemanticGraph {
 	 * @return Um vetor contendo todos os tokens do texto
 	 * @throws IOException
 	 */
-	static String[] AnalisaTexto(String texto) throws IOException {
+	static String[] AnalisaTexto(String texto, String idioma) throws IOException {
 		
-		Analyzer analisador = new EnglishAnalyzer(Version.LUCENE_44);
+		Analyzer analisador =  ObtemAnalisador(idioma);
 		
 		TokenStream tokenStream =  analisador.tokenStream("contents", new StringReader(texto));
 		CharTermAttribute termo = tokenStream.addAttribute(CharTermAttribute.class);
@@ -177,11 +191,51 @@ public class SemanticGraph {
 	
 	
 	/**
+	 * Obtém o analisador para o respectivo idioma do dicionário
+	 * @param idioma O idioma do dicionário
+	 * @return O analisador correspondente
+	 */
+	static Analyzer ObtemAnalisador(String idioma) {
+		
+		Analyzer analisador = null;
+		int idIdioma = 0;
+		
+		if (idioma.equals("es"))
+			idIdioma = 1;
+		else
+			idIdioma = 2;
+		
+		
+		switch (idIdioma) {
+		
+			case 0:
+				analisador = new EnglishAnalyzer(Version.LUCENE_44);
+				break;
+		
+			case 1:
+				analisador = new SpanishAnalyzer(Version.LUCENE_44);
+				break;	
+			
+			case 2:
+				analisador = new PortugueseAnalyzer(Version.LUCENE_44);
+				break;
+
+			default:
+				analisador = new EnglishAnalyzer(Version.LUCENE_44);
+				break;
+		}
+		
+		return analisador;
+		
+	} // Fim do método ObtemAnalisador
+	
+	
+	/**
 	 * Cria as arestas do grafo
 	 */
 	static void CriaArestas() {
 		
-		System.out.println(".:: Criando Arestas ::.\n");
+		System.out.println("[" + sdf.format(calendario.getTime()) + "] " + "Criando Arestas:\n\n");
 		
 		for (int u = 0; u < palavrasTokenizadasDicionario.size(); u++) {
 			
@@ -194,7 +248,7 @@ public class SemanticGraph {
 				if(definicaoTokenizada.contains(palavraTokenizada) && (u != v)) {		
 					
 					arestasGrafo.add(new Aresta(u, v, 0.0, palavrasDicionario.get(u), palavrasDicionario.get(v)));
-					System.out.println("[" + u + "] " + palavrasDicionario.get(u) + " -> " + "[" + v + "] " + palavrasDicionario.get(v));		
+					System.out.println("[" + u + "] " + palavrasDicionario.get(u) + " ─→ " + "[" + v + "] " + palavrasDicionario.get(v));		
 			
 				} // Fim if
 				
@@ -223,7 +277,7 @@ public class SemanticGraph {
 			grafo.AdicionaAresta(aresta);
 		
 
-		System.out.println("\n.:: Grafo - Lista de Adjacências ::.\n");
+		System.out.println("\n\n[" + sdf.format(calendario.getTime()) + "] " + "Grafo de Palavras - Lista de Adjacências:");
 		System.out.println(grafo.ListaAdjString());
 
 		
@@ -243,7 +297,8 @@ public class SemanticGraph {
 		similaridadeSemantica = new SimilaridadeSemantica(palavras1, palavras2, grafo, numeroClusters);
 		similaridadeSemantica.CalculaSimilaridades();
 		
-		System.out.println("\n\n.:: Similaridades Semântica ::.\n");
+		System.out.println("\n\n[" + sdf.format(calendario.getTime()) + "] " + "Similaridades Semânticas:\n");
+		
 		Double[] similaridades = similaridadeSemantica.getSimilaridades();
 		
 		for (Double similaridade : similaridades) {
@@ -252,8 +307,6 @@ public class SemanticGraph {
 		}
 		
 		SalvarArquivo(arquivoSimilaridades, stringBuilder.toString());
-		
-		
 		
 	} // Fim do método CalculaSimilaridadeSemantica
 	
@@ -363,6 +416,49 @@ public class SemanticGraph {
 		}
 		
 	} // Fim do método SalvarArquivo
+	
+	static void ImprimeCabeçalhoPrograma() {
+		
+		System.out.println("\n");
+		System.out.println("╔══════════════════════════════════════════════════════════════════╗");
+		System.out.println("║            	Universidade Federal de Minas Gerais               ║");
+		System.out.println("║   	Programa de Pós-Graduação em Ciência da Computação         ║");
+		System.out.println("║                Mestrado em Ciência da Computação                 ║");
+		System.out.println("║                                                                  ║");
+		System.out.println("║         TP1 - Caminhos Mínimos e Arvore Geradora Mínima          ║");
+		System.out.println("║                                                                  ║");
+		System.out.println("║   Disciplina: Projeto e Análise de Algoritmos                    ║");
+		System.out.println("║  Professores: Luiz Chaimowicz, Wagner Meira,                     ║");
+		System.out.println("║                  Gisele Pappa, Jussara Almeida                   ║");
+		System.out.println("║                                                                  ║");
+		System.out.println("║         Nome: Diego Augusto de Faria Barros                      ║");
+		System.out.println("║                                                                  ║");
+		System.out.println("║               Belo Horizonte, 07 de Outubro de 2013              ║");
+		System.out.println("╚══════════════════════════════════════════════════════════════════╝");
+		System.out.println("\n\n");
+		
+	} // Fim do método ImprimeCabecalhoPrograma
+	
+	
+	static void ImprimeInformacoesMaquina() {
+		
+		System.out.println("\n[" + sdf.format(calendario.getTime()) + "] " + "Análise Semântica Terminada!\n");
+		
+		String nomeSO = System.getProperty("os.name");
+		System.out.println("\nSistema Operacional: " + nomeSO);
+		
+		String tipoSO = System.getProperty("os.arch");
+		System.out.println("Arquitetura: " + tipoSO);
+		
+		String versaoSO = System.getProperty("os.version");
+		System.out.println("Versão do S.O: " + versaoSO);
+		
+        
+        System.out.println("Processadores Disponíveis (Núcleos): " +   
+                Runtime.getRuntime().availableProcessors());  
+          
+		
+	} // Fim do método ImprimeInformacoesMaquina
 	  
 
 	/**
@@ -370,14 +466,34 @@ public class SemanticGraph {
 	 */
 	public static void main(String[] args) {
 		
+		ImprimeCabeçalhoPrograma();
+		
+		long tempoInicio = System.currentTimeMillis();
+		
+		System.out.println("[" + sdf.format(calendario.getTime()) + "] " + "Inicializando Parâmetros . . . ");
 		Inicializa(args);
 		
+		System.out.println("[" + sdf.format(calendario.getTime()) + "] " + "Carregando Dicionário de Palavras . . . ");
+		
+		System.out.println("\n\n   Arquivo: " + arquivoDicionario.getName());
 		CarregaDicionario();
+	
+		System.out.println("[" + sdf.format(calendario.getTime()) + "] " + "Carregando Pares de Palavras . . . ");
 		CarregaParesPalavras();
 		
+		System.out.println("[" + sdf.format(calendario.getTime()) + "] " + "Construindo Grafo de Palavras . . . ");
 		ConstroiGrafo();
+		
 		MedeSimilaridadeSemantica();
 		ObtemGruposDePalavras();
+		
+		long tempoFim = System.currentTimeMillis();
+		long tempoExecucao = tempoFim - tempoInicio;
+		
+		ImprimeInformacoesMaquina();
+
+		System.out.println("\nTempo Total de Execução: " + tempoExecucao + " ms");
+		
 		
 	} // Fim do método Main
 
